@@ -1,5 +1,6 @@
 .git
 .gitignore
 is3106backend/Dockerfile
+scripts/generate_requirements.sh
 # README.md
 docker-compose.yml

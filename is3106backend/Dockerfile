@@ -17,5 +17,11 @@ COPY ./requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-#copy project
+# copy entrypoint.sh
+COPY ./entrypoint.sh .
+
+# copy project
 COPY . .
+
+# run entrypoint.sh
+ENTRYPOINT [ "/is3106backend/entrypoint.sh" ]
