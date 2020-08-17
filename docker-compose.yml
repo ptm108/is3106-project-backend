@@ -5,7 +5,7 @@ services:
     build: ./is3106backend
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./app/:/usr/src/app/
+      - ./is3106backend/:/usr/src/is3106backend/
     ports:
       - 8000:8000
     env_file:
