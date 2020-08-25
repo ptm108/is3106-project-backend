@@ -51,7 +51,6 @@ To access admin panel on Django, you need to create a superuser:
 docker-compose exec web python manage.py createsuperuser
 ```
 
-<br/><br/>
 Follow the instructions to set up authentication details for the admin panel.
 
 The admin panel is accessible at `localhost:8000/admin`
