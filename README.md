@@ -2,4 +2,62 @@
 
 DigiOrg.io is developed under NUS's School of Computing IS3106 Module. DigiOrg.io provides a one stop storage solution for all legal documents. The tech stack powering DigiOrg's backend comprises of Django, Django Rest Framework, PostgreSQL as our RDB, and AWS as our hosting solution.
 
-![alt text](https://camo.githubusercontent.com/cf05625198fe7b6ad8a302d1ce16bc99b93ec2ac/68747470733a2f2f6d6174657269616c2d75692e636f6d2f7374617469632f6c6f676f2e737667 "Material UI")
+<img src="https://www.djangoproject.com/m/img/logos/django-logo-positive.png" width="100"> <img src="https://zdnet2.cbsistatic.com/hub/i/r/2018/04/19/092cbf81-acac-4f3a-91a1-5a26abc1721f/thumbnail/770x578/5d78c50199e6a9242367b37892be8057/postgresql-logo.png" width="100"> <img src="https://www.django-rest-framework.org/img/logo.png" width="100">  <img src="https://futurumresearch.com/wp-content/uploads/2020/01/aws-logo.png" width="100">
+
+## Local setup
+
+We are using docker containers for fast local deployment with minimal installations.
+
+| Prerequisites  | Version | Links |
+| -------------- | ------- | ----- |
+| Docker Desktop | 19.03.12 | [Link](https://www.docker.com/products/docker-desktop) |
+| Python 3       | > 3.8 | [Link](https://www.python.org/downloads/) |
+| pipenv         | 2020.8.13 | [Link](https://pypi.org/project/pipenv/) |
+
+### To deploy locally
+
+Clone this repository
+
+``` bash
+git clone git@github.com:ptm108/is3106-project-backend.git
+```
+
+*Before you start, get the `.env.dev` file from TM or Eliz and place it in the `root folder`*
+
+Ensure that Docker Desktop is up and running.
+
+**When setting up for the first time:**
+
+We will need to build the docker image and deploy it.
+
+Build the docker image:
+
+``` bash
+docker-compose build
+```
+
+Run the docker container:
+
+``` bash
+docker-compose up -d
+```
+
+The backend is accessible at `localhost:8000`
+
+To access admin panel on Django, you need to create a superuser:
+
+*To access the linux vm on docker to run commands, use `docker-compose exec <service> <command>`. In this case we are running python on the web service*
+
+``` bash
+docker-compose exec web python manage.py createsuperuser
+```
+
+Follow the instructions to set up authentication details for the admin panel.
+
+The admin panel is accessible at `localhost:8000/admin`
+
+To undeploy docker container: (*Add -v flag to spin down postgres volume. Warning: database will be wiped*)
+
+``` bash
+docker-compose down
+```
