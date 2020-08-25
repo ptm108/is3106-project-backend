@@ -11,8 +11,6 @@ We are using docker containers for fast local deployment with minimal installati
 | Prerequisites  | Version | Links |
 | -------------- | ------- | ----- |
 | Docker Desktop | 19.03.12 | [Link](https://www.docker.com/products/docker-desktop) |
-| Python 3       | > 3.8 | [Link](https://www.python.org/downloads/) |
-| pipenv         | 2020.8.13 | [Link](https://pypi.org/project/pipenv/) |
 
 ### To deploy locally
 
