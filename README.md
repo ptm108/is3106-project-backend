@@ -23,8 +23,9 @@ git clone git@github.com:ptm108/is3106-project-backend.git
 *Before you start, get the `.env.dev` file from TM or Eliz and place it in the `root folder`*
 
 Ensure that Docker Desktop is up and running.
+<br/><br/>
 
-**When setting up for the first time:**
+### When setting up for the first time:
 
 We will need to build the docker image and deploy it.
 
@@ -46,12 +47,11 @@ The backend is accessible at `localhost:8000`
 
 To access admin panel on Django, you need to create a superuser:
 
-*To access the linux vm on docker to run commands, use `docker-compose exec <service> <command>`. In this case we are running python on the web service*
-
 ``` bash
 docker-compose exec web python manage.py createsuperuser
 ```
 
+<br/><br/>
 Follow the instructions to set up authentication details for the admin panel.
 
 The admin panel is accessible at `localhost:8000/admin`
