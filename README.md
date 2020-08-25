@@ -2,7 +2,7 @@
 
 DigiOrg.io is developed under NUS's School of Computing IS3106 Module. DigiOrg.io provides a one stop storage solution for all legal documents. The tech stack powering DigiOrg's backend comprises of Django, Django Rest Framework, PostgreSQL as our RDB, and AWS as our hosting solution.
 
-<img src="https://www.djangoproject.com/m/img/logos/django-logo-positive.png" width="100"> <img src="https://zdnet2.cbsistatic.com/hub/i/r/2018/04/19/092cbf81-acac-4f3a-91a1-5a26abc1721f/thumbnail/770x578/5d78c50199e6a9242367b37892be8057/postgresql-logo.png" width="100"> <img src="https://www.django-rest-framework.org/img/logo.png" width="100">  <img src="https://futurumresearch.com/wp-content/uploads/2020/01/aws-logo.png" width="100">
+<img src="https://www.djangoproject.com/m/img/logos/django-logo-positive.png" width="100"> <img src="https://zdnet2.cbsistatic.com/hub/i/r/2018/04/19/092cbf81-acac-4f3a-91a1-5a26abc1721f/thumbnail/770x578/5d78c50199e6a9242367b37892be8057/postgresql-logo.png" width="100"> <img src="https://www.django-rest-framework.org/img/logo.png" width="100"> <img src="https://futurumresearch.com/wp-content/uploads/2020/01/aws-logo.png" width="100">
 
 ## Local setup
 
@@ -44,6 +44,8 @@ docker-compose up -d
 
 The backend is accessible at `localhost:8000`
 
+---
+
 To access admin panel on Django, you need to create a superuser:
 
 *To access the linux vm on docker to run commands, use `docker-compose exec <service> <command>`. In this case we are running python on the web service*
@@ -55,6 +57,8 @@ docker-compose exec web python manage.py createsuperuser
 Follow the instructions to set up authentication details for the admin panel.
 
 The admin panel is accessible at `localhost:8000/admin`
+
+---
 
 To undeploy docker container: (*Add -v flag to spin down postgres volume. Warning: database will be wiped*)
 
