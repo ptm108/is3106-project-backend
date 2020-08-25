@@ -32,13 +32,14 @@ ALLOWED_HOSTS = [] if os.environ.get("DJANGO_ALLOWED_HOSTS") is None else os.env
 # Application definition
 
 INSTALLED_APPS = [
+    'appusers',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'appusers',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +71,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'is3106backend.wsgi.application'
+
+AUTH_USER_MODEL = 'appusers.CustomUser'
 
 
 # Database
