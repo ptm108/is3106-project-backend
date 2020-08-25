@@ -1,3 +1,4 @@
 # environment segrets
 .env.dev
 .env
+.vscode/*
