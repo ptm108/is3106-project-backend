@@ -32,7 +32,7 @@ ALLOWED_HOSTS = [] if os.environ.get("DJANGO_ALLOWED_HOSTS") is None else os.env
 # Application definition
 
 INSTALLED_APPS = [
-    'auth',
+    'users',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -80,7 +80,7 @@ REST_FRAMEWORK = {
 
 WSGI_APPLICATION = 'is3106backend.wsgi.application'
 
-AUTH_USER_MODEL = 'appusers.CustomUser'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 
 # Database
