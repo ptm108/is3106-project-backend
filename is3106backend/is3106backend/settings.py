@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -70,6 +70,13 @@ TEMPLATES = [
     },
 ]
 
+WSGI_APPLICATION = 'is3106backend.wsgi.application'
+
+AUTH_USER_MODEL = 'users.CustomUser'
+
+
+# Rest framework related configurations
+
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -81,9 +88,9 @@ REST_FRAMEWORK = {
     )
 }
 
-WSGI_APPLICATION = 'is3106backend.wsgi.application'
-
-AUTH_USER_MODEL = 'users.CustomUser'
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+}
 
 
 # Database
