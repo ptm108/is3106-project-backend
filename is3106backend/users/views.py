@@ -1,5 +1,16 @@
-from django.http import HttpResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
-def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+import logging
+
+# getting instance of logger
+logger = logging.getLogger(__name__)
+
+class HelloView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        print(request.user)
+        content = {'message': 'Hello, World!'}
+        return Response(content)

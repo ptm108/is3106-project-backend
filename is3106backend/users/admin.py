@@ -64,7 +64,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('id', 'email', 'is_admin')
     list_filter = ('is_admin',)
     fieldsets = (
-        (None, {'fields': ('id', 'email', 'password')}),
+        (None, {'fields': ('email', 'password')}),
         ('Permissions', {'fields': ('is_admin',)}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -78,6 +78,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('id', 'email',)
     ordering = ('email',)
     filter_horizontal = ()
+
 
 admin.site.register(CustomUser, UserAdmin)
 admin.site.unregister(Group)
