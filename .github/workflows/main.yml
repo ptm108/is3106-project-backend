@@ -23,6 +23,7 @@ jobs:
       - uses: actions/checkout@v2
 
       # Runs a single command using the runners shell
-      - name: wemake-python-styleguide
-        uses: wemake-services/wemake-python-styleguide@0.14.1
+      - name: pylint-and-format
+        uses: itsvinayak/pylint-and-format@v1.1
+
 
