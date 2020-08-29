@@ -7,11 +7,13 @@ from django.utils import timezone
 
 import uuid
 
+
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
     """
+
     def create_user(self, email, password, **extra_fields):
         """
         Create and save a User with the given email and password.
@@ -23,6 +25,7 @@ class CustomUserManager(BaseUserManager):
         user.set_password(password)
         user.save()
         return user
+    # end def
 
     def create_superuser(self, email, password, **extra_fields):
         """
@@ -37,6 +40,9 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
+    # end def
+# end class
+
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -53,13 +59,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+    # end def
 
     def has_perm(self, perm, obj=None):
         return super().has_perm(perm, obj=obj)
+    # end def
 
     def has_module_perms(self, app_label):
         return super().has_module_perms(app_label)
-    
+    # end def
+
     @property
     def is_staff(self):
         return self.is_admin
+    # end def
+    
+# end class

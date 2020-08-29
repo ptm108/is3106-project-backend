@@ -17,6 +17,7 @@ class UserCreationForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ('email',)
+    # end class
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -24,15 +25,25 @@ class UserCreationForm(forms.ModelForm):
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             raise ValidationError("Passwords don't match")
+        # end if
+
         return password2
+
+    # end def
 
     def save(self, commit=True):
         # Save the provided password in hashed format
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
+
         if commit:
             user.save()
+        # end if
+
         return user
+    # end def
+
+# end class
 
 
 class UserChangeForm(forms.ModelForm):
@@ -45,12 +56,16 @@ class UserChangeForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ('email', 'password', 'is_active', 'is_admin')
+    # end class
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
         return self.initial["password"]
+    # end def
+
+# end class
 
 
 class UserAdmin(BaseUserAdmin):
@@ -79,6 +94,7 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
     filter_horizontal = ()
 
+# end class
 
 admin.site.register(CustomUser, UserAdmin)
 admin.site.unregister(Group)
