@@ -17,6 +17,32 @@ class HelloView(APIView):
     # end def
 # end class
 
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def create_user(request):
+    """
+    Creates a new application user
+    """
+
+    if request.method == 'POST':
+        content = {"message": "Successfully created"}
+        data = request.data  # {'email': 'd@d.com', 'password': 'password2'}
+
+        try:
+            user = CustomUser(email=data['email'], password=data['password'])
+            user.save()
+
+            return Response(content, status=status.HTTP_201_CREATED)
+        except ValueError:
+            content.message = 'Invalid data'
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        # end try-except
+
+    # end if
+
+    return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+# end def
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -43,33 +69,5 @@ def delete_user(request):
         # end try-except
 
     # end if
-
-# end def
-
-
-@api_view(['POST'])
-@permission_classes((AllowAny,))
-def create_user(request):
-    """
-    Creates a new application user
-    """
-
-    if request.method == 'POST':
-        content = {"message": "Successfully created"}
-        data = request.data  # {'email': 'd@d.com', 'password': 'password2'}
-
-        try:
-            user = CustomUser(email=data['email'], password=data['password'])
-            user.save()
-
-            return Response(content, status=status.HTTP_201_CREATED)
-        except ValueError:
-            content.message = 'Invalid data'
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        # end try-except
-
-    # end if
-
-    return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
 # end def
