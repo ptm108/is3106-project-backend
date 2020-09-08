@@ -9,15 +9,15 @@ class Recipe(models.Model):
     recipe_name = models.CharField(max_length=100)
     date_created = models.DateTimeField(default=timezone.now, editable=False)
     fulfillment_date = models.DateTimeField(default=timezone.now)
-    estimated_price_start = models.DecimalField(decimal_places=2)
-    estimated_price_end = models.DecimalField(decimal_places=2)
-    final_price = models.DecimalField(null=True)
+    estimated_price_start = models.DecimalField(decimal_places=2, max_digits=6)
+    estimated_price_end = models.DecimalField(decimal_places=2, max_digits=6)
+    final_price = models.DecimalField(decimal_places=2, max_digits=6, null=True)
 
     # recipe owner, set null when user is deleted
     owner = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True)
 
     # temp model for vendor, set null when vendor is deleted
-    vendor = models.ForeignKey('user.Vendor', on_delete=models.SET_NULL, null=True)
+    vendor = models.ForeignKey('users.Vendor', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return f'{self.recipe_id}: {self.name} created on {self.date_created}'
