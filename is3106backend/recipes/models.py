@@ -14,13 +14,13 @@ class Recipe(models.Model):
     final_price = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
 
     # recipe owner, set null when user is deleted
-    owner = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True)
+    owner = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True)
 
     # temp model for vendor, set null when vendor is deleted
     vendor = models.ForeignKey('users.Vendor', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.recipe_id}: {self.recipe_name} created on {self.date_created}'
+        return f'{self.recipe_name}; {self.date_created}'
     # end def
 
 # end class
@@ -32,13 +32,13 @@ class Ingredient(models.Model):
     ing_name = models.CharField(max_length=200)
     image_url = models.URLField(max_length=300)
     category = models.CharField(max_length=100)
-    metadata = models.JSONField()  # stores metadata json from NTUC
+    metadata = models.JSONField()  # stores metadata json from vendor
 
     # recipe ref
     recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.ing_name} from {self.category} created in {self.date_created}'
+        return f'{self.ing_name} ({self.category}) created in {self.date_created}'
     # end def
 
 # end class
