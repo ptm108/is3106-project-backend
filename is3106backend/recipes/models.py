@@ -34,7 +34,7 @@ class Ingredient(models.Model):
     category = models.CharField(max_length=100)
     metadata = models.JSONField()  # stores metadata json from NTUC
 
-    # recipe
+    # recipe ref
     recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE)
 
     def __str__(self):
