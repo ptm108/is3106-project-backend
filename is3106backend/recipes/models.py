@@ -41,6 +41,8 @@ class Ingredient(models.Model):
     # recipe ref
     recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, related_name='ingredients')
 
+    ingredient_list = models.Manager()
+
     def __str__(self):
         return f'{self.ing_name} ({self.category}) created in {self.date_created}'
     # end def

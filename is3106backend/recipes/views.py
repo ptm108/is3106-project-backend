@@ -8,7 +8,7 @@ import json
 
 from .models import Recipe, Ingredient
 # from orders.models import GroupBuy
-from .serializers import RecipeSerializer
+from .serializers import RecipeSerializer, IngredientSerializer
 
 
 class DefaultView(APIView):
