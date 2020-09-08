@@ -40,6 +40,7 @@ def create_recipe(request):
                 fulfillment_date=data['fulfillment_date'],
                 estimated_price_start=data['estimated_price_start'],
                 estimated_price_end=data['estimated_price_end'],
+                owner=user
             )
             recipe.save()
 
