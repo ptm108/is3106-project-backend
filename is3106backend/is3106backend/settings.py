@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [] if os.environ.get("DJANGO_ALLOWED_HOSTS") is None else os.env
 
 INSTALLED_APPS = [
     'users',
+    'recipes',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
