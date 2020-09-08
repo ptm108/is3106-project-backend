@@ -8,7 +8,7 @@ class Recipe(models.Model):
     recipe_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     recipe_name = models.CharField(max_length=100)
     date_created = models.DateTimeField(default=timezone.now, editable=False)
-    fulfillment_date = models.DateTimeField(default=timezone.now)
+    fulfillment_date = models.DateField()
     estimated_price_start = models.DecimalField(decimal_places=2, max_digits=6)
     estimated_price_end = models.DecimalField(decimal_places=2, max_digits=6)
     final_price = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)

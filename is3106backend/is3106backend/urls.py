@@ -30,6 +30,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('users.urls')),
 
+    # recipe endpoints
+    path('recipes/', include('recipes.urls')),
+
     # rest framework end points
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
