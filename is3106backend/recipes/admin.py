@@ -3,7 +3,7 @@ from .models import Recipe, Ingredient
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('recipe_id', 'recipe_name', 'owner', 'final_price', 'fulfillment_date')
+    list_display = ('recipe_id', 'recipe_name', 'owner', 'final_price', 'fulfillment_date', 'deleted')
 # end class
 
 class IngredientAdmin(admin.ModelAdmin):

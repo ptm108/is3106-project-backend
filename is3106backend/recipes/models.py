@@ -12,12 +12,16 @@ class Recipe(models.Model):
     estimated_price_start = models.DecimalField(decimal_places=2, max_digits=6)
     estimated_price_end = models.DecimalField(decimal_places=2, max_digits=6)
     final_price = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    deleted = models.BooleanField(default=False)
 
     # recipe owner, set null when user is deleted
     owner = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True)
 
     # temp model for vendor, set null when vendor is deleted
     vendor = models.ForeignKey('users.Vendor', on_delete=models.SET_NULL, null=True, blank=True)
+
+    # recipe model manager
+    recipe_book = models.Manager()
 
     def __str__(self):
         return f'{self.recipe_name}; {self.date_created}'
@@ -35,7 +39,7 @@ class Ingredient(models.Model):
     metadata = models.JSONField()  # stores metadata json from vendor
 
     # recipe ref
-    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE)
+    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, related_name='ingredients')
 
     def __str__(self):
         return f'{self.ing_name} ({self.category}) created in {self.date_created}'

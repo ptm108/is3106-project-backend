@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 import json
 
 from .models import Recipe, Ingredient
-# from .serializers import CustomUserSerializer
+# from orders.models import GroupBuy
+from .serializers import RecipeSerializer
 
 
 class DefaultView(APIView):
@@ -62,4 +63,66 @@ def create_recipe(request):
 
     return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
 
+# end def
+
+@api_view(['DELETE'])
+@permission_classes((IsAuthenticated,))
+def delete_recipe(request, pk):
+    '''
+    Marks a recipe as deleted
+    HOWEVER, if group buy has been approved, it will still proceed accordingly
+    '''
+    if request.method == 'DELETE':
+        user = request.user
+        try:  
+            Recipe.recipe_book.filter(owner=user, pk=pk).update(deleted=True)
+            return Response({'message': 'Recipe deleted'}, status=status.HTTP_200_OK)
+        except Recipe.DoesNotExist:
+            return Response({'message': 'Recipe not found'}, status=status.HTTP_200_OK)
+        # end try-except
+    # end if
+
+    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
+# end def
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def undelete_recipe(request, pk):
+    '''
+    Undeletes a recipe
+    No effect on group buys
+    '''
+    if request.method == 'POST':
+        user = request.user
+        print(pk)
+        try:  
+            Recipe.recipe_book.filter(owner=user, pk=pk).update(deleted=False)
+            return Response({'message': 'Recipe undeleted'}, status=status.HTTP_200_OK)
+        except Recipe.DoesNotExist:
+            return Response({'message': 'Recipe not found'}, status=status.HTTP_200_OK)
+        # end try-except
+    # end if
+
+    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
+# end def
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def get_recipes(request):
+    '''
+    Retrieves all recipes created by user making request
+    '''
+    if request.method == 'GET':
+        user = request.user
+        try:  
+            recipes = Recipe.recipe_book.filter(owner=user)
+            serializer = RecipeSerializer(recipes, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Recipe.DoesNotExist:
+            return Response({'message': 'No recipes found'}, status=status.HTTP_200_OK)
+        # end try-except
+    # end if
+
+    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
 # end def
