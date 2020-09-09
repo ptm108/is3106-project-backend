@@ -8,17 +8,12 @@ class Recipe(models.Model):
     recipe_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     recipe_name = models.CharField(max_length=100)
     date_created = models.DateTimeField(default=timezone.now, editable=False)
-    fulfillment_date = models.DateField()
     estimated_price_start = models.DecimalField(decimal_places=2, max_digits=6)
     estimated_price_end = models.DecimalField(decimal_places=2, max_digits=6)
-    final_price = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
     deleted = models.BooleanField(default=False)
 
     # recipe owner, set null when user is deleted
-    owner = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True)
-
-    # temp model for vendor, set null when vendor is deleted
-    vendor = models.ForeignKey('users.Vendor', on_delete=models.SET_NULL, null=True, blank=True)
+    owner = models.OneToOneField('users.CustomUser', on_delete=models.SET_NULL, null=True)
 
     # recipe model manager
     recipe_book = models.Manager()

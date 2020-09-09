@@ -15,6 +15,9 @@ class Groupbuy(models.Model):
     # Recipe ref
     recipe = models.OneToOneField(Recipe, on_delete=models.SET_NULL, null=True)
 
+    # temp model for vendor, set null when vendor is deleted
+    vendor = models.OneToOneField('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True)
+
     groupbuys = models.Manager()
 
     # method to get groupbuy status
