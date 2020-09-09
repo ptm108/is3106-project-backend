@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import CustomUser, DeliveryAddress
+from .models import CustomUser, VendorUser, DeliveryAddress
 
 
 class UserCreationForm(forms.ModelForm):
@@ -68,7 +68,17 @@ class UserChangeForm(forms.ModelForm):
 # end class
 
 
+class VendorInline(admin.StackedInline):
+    model = VendorUser
+    can_delete = False
+    verbose_name_plural = 'vendor'
+
+# end class
+
 class UserAdmin(BaseUserAdmin):
+    # Vendor's inline
+    inlines = (VendorInline,)
+
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm
@@ -102,5 +112,6 @@ class DeliveryAddressAdmin(admin.ModelAdmin):
 # end class
 
 admin.site.register(CustomUser, UserAdmin)
+admin.site.register(VendorUser)
 admin.site.register(DeliveryAddress, DeliveryAddressAdmin)
 admin.site.unregister(Group)

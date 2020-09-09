@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import CustomUser, DeliveryAddress
+from .models import CustomUser, VendorUser, DeliveryAddress
 from .serializers import CustomUserSerializer, DeliveryAddressSerializer
 
 
@@ -30,8 +30,12 @@ def create_user(request):
         data = request.data  # {'email': 'd@d.com', 'password': 'password2'}
 
         try:
-            user = CustomUser(email=data['email'], password=data['password'])
+            user = CustomUser.objects.create_user(data['email'], data['password'])
             user.save()
+
+            if data['vendor_name'] is not None:
+                vendor = VendorUser(user=user, vendor_name=data['vendor_name'], is_vendor=True)
+                vendor.save()
 
             return Response(content, status=status.HTTP_201_CREATED)
         except ValueError:
@@ -45,14 +49,14 @@ def create_user(request):
 
 # end def
 
-@api_view(['PUT'])
+@api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_user(request):
     """
     Marks user as deleted when called
     """
 
-    if request.method == 'PUT':
+    if request.method == 'DELETE':
         content = {'message': 'Successfully deleted'}
 
         try:
