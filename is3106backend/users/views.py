@@ -32,7 +32,7 @@ def create_user(request):
         try:
             user = CustomUser(email=data['email'], password=data['password'])
             user.save()
-
+            
             return Response(content, status=status.HTTP_201_CREATED)
         except ValueError:
             content.message = 'Invalid data'

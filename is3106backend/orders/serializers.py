@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from .models import Groupbuy
+from .models import Groupbuy, Order
 from recipes.serializers import RecipeSerializer
+from users.serializers import DeliveryAddressSerializer
 
 
 class GroupbuySerializer(serializers.ModelSerializer):
@@ -12,6 +13,20 @@ class GroupbuySerializer(serializers.ModelSerializer):
         model = Groupbuy
         read_only_fields = (
             'status',
+        )
+        fields = '__all__'
+    # end Meta class
+# end class
+
+class OrderSerializer(serializers.ModelSerializer):
+    groupbuy = GroupbuySerializer()
+    delivery_address = DeliveryAddressSerializer()
+
+    class Meta:
+        model = Order
+        read_only_fields = (
+            'groupbuy',
+            'delivery_address',
         )
         fields = '__all__'
     # end Meta class

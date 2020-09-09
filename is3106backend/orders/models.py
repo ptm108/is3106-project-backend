@@ -26,7 +26,7 @@ class Groupbuy(models.Model):
     # method to get groupbuy status
     def get_status(self):
         if timezone.now() > self.fulfillment_date: 
-            return "GROUPBUY_EXPIRED" if not self.approval_status else "DELIVERED"
+            return "DELIVERED" if self.approval_status and self.current_order_quantity >= self.minimum_order_quantity else "GROUPBUY_EXPIRED"
         # end if
 
         if not self.approval_status: return "PENDING_APPROVAL"
@@ -54,6 +54,8 @@ class Order(models.Model):
 
     # group buy ref, set null when group buy is deleted
     groupbuy = models.ForeignKey('Groupbuy', on_delete=models.SET_NULL, null=True)
+
+    orders = models.Manager()
 
     def __str__(self):
         return f'Order ID: {self.o_id}'

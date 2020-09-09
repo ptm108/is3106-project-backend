@@ -97,7 +97,7 @@ class UserAdmin(BaseUserAdmin):
 # end class
 
 class DeliveryAddressAdmin(admin.ModelAdmin):
-    list_display = ('deliveryAddress_id', 'user', 'address_line1', 'address_line2', 'postal_code')
+    list_display = ('add_id', 'user', 'address_line1', 'address_line2', 'postal_code')
 
 # end class
 
