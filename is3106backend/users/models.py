@@ -76,8 +76,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     
 # end class
 
+class VendorUser(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    vendor_name = models.CharField(max_length=200, null=True)
+    is_vendor = models.BooleanField(default=False, editable=False)
+
+    def __str__(self):
+        return f'{self.vendor_name}'
+    #end def
+
+# end class
+
 class DeliveryAddress(models.Model):
-    deliveryAddress_id =  models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    add_id =  models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     address_line1 = models.CharField(max_length=100)
     address_line2 = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=6)
@@ -85,7 +96,7 @@ class DeliveryAddress(models.Model):
     # user's delivery address
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, null=True)
 
-    deliveryAddress_list = models.Manager()
+    address_list = models.Manager()
 
     def __str__(self):
         return f'{self.postal_code}'
@@ -93,6 +104,3 @@ class DeliveryAddress(models.Model):
 
 #end class
 
-#  temp Vendor model for linking purposes
-class Vendor(models.Model):
-    pass

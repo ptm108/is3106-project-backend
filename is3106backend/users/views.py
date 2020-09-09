@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import CustomUser, DeliveryAddress
+from .models import CustomUser, VendorUser, DeliveryAddress
 from .serializers import CustomUserSerializer, DeliveryAddressSerializer
 
 
@@ -29,15 +29,17 @@ def create_user(request):
         content = {"message": "Successfully created"}
         data = request.data  # {'email': 'd@d.com', 'password': 'password2'}
 
-        try:
-            user = CustomUser(email=data['email'], password=data['password'])
+        with transaction.atomic():
+            user = CustomUser.objects.create_user(data['email'], data['password'])
             user.save()
 
+            if 'vendor_name' in data:
+                vendor = VendorUser(user=user, vendor_name=data['vendor_name'], is_vendor=True)
+                vendor.save()
+
             return Response(content, status=status.HTTP_201_CREATED)
-        except ValueError:
-            content.message = 'Invalid data'
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        # end try-except
+
+        # end with
 
     # end if
 
@@ -45,14 +47,14 @@ def create_user(request):
 
 # end def
 
-@api_view(['PUT'])
+@api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_user(request):
     """
     Marks user as deleted when called
     """
 
-    if request.method == 'PUT':
+    if request.method == 'DELETE':
         content = {'message': 'Successfully deleted'}
 
         try:
@@ -93,7 +95,7 @@ def create_delivery_address(request):
             )
             deliveryAddress.save()
         # end with
-        return Response({'message': 'Delivery Address created'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Delivery Address created', 'add_id': deliveryAddress.add_id}, status=status.HTTP_200_OK)
     # end if
 
     return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
