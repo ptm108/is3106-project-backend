@@ -92,7 +92,3 @@ class DeliveryAddress(models.Model):
     #end def
 
 #end class
-
-#  temp Vendor model for linking purposes
-class Vendor(models.Model):
-    pass
