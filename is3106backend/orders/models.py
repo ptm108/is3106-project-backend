@@ -15,11 +15,11 @@ class Groupbuy(models.Model):
     final_price = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
     fulfillment_date = models.DateTimeField(default=timezone.now()+timedelta(days=7))
 
-    # Recipe ref
+    # Recipe ref, set null when recipe is deleted
     recipe = models.OneToOneField(Recipe, on_delete=models.SET_NULL, null=True)
 
-    # temp model for vendor, set null when vendor is deleted
-    vendor = models.OneToOneField('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True)
+    # vendor ref, set null when vendor is deleted
+    vendor = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True, blank=True)
 
     groupbuys = models.Manager()
 
@@ -44,11 +44,16 @@ class Order(models.Model):
     o_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     order_date = models.DateTimeField(default=timezone.now, editable=False)
     order_quantity = models.PositiveSmallIntegerField()
-    delivery_address = models.CharField(max_length=200) # temp replacement
     order_price = models.DecimalField(decimal_places=2, max_digits=6)
 
-    # user who placed order
-    buyer = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True)
+    # user who placed order, deleted when user is deleted
+    buyer = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, null=True)
+
+    # delivery address of buyer, set null when delivery address is deleted
+    delivery_address = models.ForeignKey('users.DeliveryAddress', on_delete=models.SET_NULL, null=True)
+
+    # group buy ref, set null when group buy is deleted
+    groupbuy = models.ForeignKey('Groupbuy', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return f'Order ID: {self.o_id}'

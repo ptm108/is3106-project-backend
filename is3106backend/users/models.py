@@ -103,4 +103,3 @@ class DeliveryAddress(models.Model):
     #end def
 
 #end class
-
