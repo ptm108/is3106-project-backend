@@ -4,7 +4,11 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.utils import timezone
+
+from datetime import datetime 
 import json
+from pytz import utc
 
 from .models import Recipe, Ingredient
 # from orders.models import GroupBuy
@@ -32,6 +36,11 @@ def create_recipe(request):
         user = request.user
         data = request.data
         res = {}
+
+        # date validation
+        if timezone.now() > utc.localize(datetime.strptime(data['fulfillment_date'], '%Y-%m-%d')):
+            return Response({'message': 'Invalid date'}, status=status.HTTP_400_BAD_REQUEST)
+        # end if
 
         # start atomic transaction to create recipe and required ingredients
         with transaction.atomic():
