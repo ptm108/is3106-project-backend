@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+from datetime import timedelta
 import uuid
 from recipes.models import Recipe
 
@@ -11,6 +12,8 @@ class Groupbuy(models.Model):
     minimum_order_quantity = models.PositiveIntegerField(blank=True, null=True)
     approval_status = models.BooleanField(default=False)
     order_by = models.DateTimeField()
+    final_price = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
+    fulfillment_date = models.DateTimeField(default=timezone.now()+timedelta(days=7))
 
     # Recipe ref
     recipe = models.OneToOneField(Recipe, on_delete=models.SET_NULL, null=True)
