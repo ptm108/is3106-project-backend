@@ -25,12 +25,24 @@ class DefaultView(APIView):
 def all_groupbuys(request):
     """
     Retrieves all groupbuys
+    Supports filter, orderby and pagination (pagesize, page)
     """
 
     if request.method == 'GET':
         groupbuys = Groupbuy.groupbuys.all()
+
+        # get all params from request, None otherwise
+        after_date = request.query_params.get('afterdate', None)
+        before_date = request.query_params.get('beforedate', None)
+        order_by = request.query_params.get('orderby', None)
+
+        # get pagination params from request, default is (10, 1)
+        page_size = request.query_params.get('pagesize', 10)
+        page = request.query_params.get('page', 1)
+
+
         serializer = GroupbuySerializer(groupbuys, many=True)
-        
+
         return Response(serializer.data, status=status.HTTP_200_OK)
     # end if 
 

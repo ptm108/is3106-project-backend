@@ -48,7 +48,6 @@ def create_recipe(request):
             # create recipe
             recipe = Recipe(
                 recipe_name=data['recipe_name'],
-                fulfillment_date=data['fulfillment_date'],
                 estimated_price_start=data['estimated_price_start'],
                 estimated_price_end=data['estimated_price_end'],
                 owner=user
@@ -70,6 +69,7 @@ def create_recipe(request):
 
             # create groupbuy associated to this recipe
             groupbuy = Groupbuy(
+                fulfillment_date=f_date,
                 order_by=f_date-timedelta(days=2),  # max order-by date is 2 days before fulfillment date
                 recipe=recipe
             )
