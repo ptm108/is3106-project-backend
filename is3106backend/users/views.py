@@ -29,19 +29,17 @@ def create_user(request):
         content = {"message": "Successfully created"}
         data = request.data  # {'email': 'd@d.com', 'password': 'password2'}
 
-        try:
+        with transaction.atomic():
             user = CustomUser.objects.create_user(data['email'], data['password'])
             user.save()
 
-            if data['vendor_name'] is not None:
+            if 'vendor_name' in data:
                 vendor = VendorUser(user=user, vendor_name=data['vendor_name'], is_vendor=True)
                 vendor.save()
 
             return Response(content, status=status.HTTP_201_CREATED)
-        except ValueError:
-            content.message = 'Invalid data'
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        # end try-except
+
+        # end with
 
     # end if
 
@@ -97,7 +95,7 @@ def create_delivery_address(request):
             )
             deliveryAddress.save()
         # end with
-        return Response({'message': 'Delivery Address created'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Delivery Address created', 'add_id': deliveryAddress.add_id}, status=status.HTTP_200_OK)
     # end if
 
     return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
