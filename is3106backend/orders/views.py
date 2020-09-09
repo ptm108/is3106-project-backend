@@ -79,13 +79,19 @@ def all_groupbuys(request):
 @permission_classes((IsAuthenticated,))
 def approve_groupbuy(request, pk):
     """
-    Toggles groupbuy's approval status
+    Toggles groupbuy's approval status and assigned vendor to groupbuy
     Only accessible by vendors
     """
 
     if request.method == 'PATCH':
+        vendor = request.user
+
         try:
             groupbuy = Groupbuy.groupbuys.get(pk=pk)
+
+            if not groupbuy.approval_status: groupbuy.vendor = vendor
+            else: groupbuy.vendor = None
+
             groupbuy.approval_status = not groupbuy.approval_status
             groupbuy.save()
             return Response({
