@@ -45,14 +45,14 @@ def create_user(request):
 
 # end def
 
-@api_view(['PUT'])
+@api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_user(request):
     """
     Marks user as deleted when called
     """
 
-    if request.method == 'PUT':
+    if request.method == 'DELETE':
         content = {'message': 'Successfully deleted'}
 
         try:
