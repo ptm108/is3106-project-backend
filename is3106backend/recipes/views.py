@@ -6,12 +6,12 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils import timezone
 
-from datetime import datetime 
+from datetime import datetime, timedelta
 import json
 from pytz import utc
 
 from .models import Recipe, Ingredient
-# from orders.models import GroupBuy
+from orders.models import Groupbuy
 from .serializers import RecipeSerializer, IngredientSerializer
 
 
@@ -35,16 +35,17 @@ def create_recipe(request):
     if request.method == 'POST':
         user = request.user
         data = request.data
-        res = {}
 
         # date validation
-        if timezone.now() > utc.localize(datetime.strptime(data['fulfillment_date'], '%Y-%m-%d')):
+        f_date = utc.localize(datetime.strptime(data['fulfillment_date'], '%Y-%m-%d'))
+
+        if timezone.now() > f_date:
             return Response({'message': 'Invalid date'}, status=status.HTTP_400_BAD_REQUEST)
         # end if
 
         # start atomic transaction to create recipe and required ingredients
         with transaction.atomic():
-            print(data['fulfillment_date'])
+            # create recipe
             recipe = Recipe(
                 recipe_name=data['recipe_name'],
                 fulfillment_date=data['fulfillment_date'],
@@ -54,6 +55,7 @@ def create_recipe(request):
             )
             recipe.save()
 
+            # create necessary ingredients
             for ing in data['ingredients']:
                 ingredient = Ingredient(
                     foreign_id=ing['foreign_id'],
@@ -66,13 +68,24 @@ def create_recipe(request):
                 ingredient.save()
             # end for
 
+            # create groupbuy associated to this recipe
+            groupbuy = Groupbuy(
+                order_by=f_date - timedelta(days=2),  # max order-by date is 2 days before fulfillment date
+                recipe=recipe
+            )
+            groupbuy.save()
         # end with
-        return Response({'message': 'Recipe created'}, status=status.HTTP_200_OK)
+
+        return Response({
+            'message': 'Recipe created',
+            "recipe_id": recipe.recipe_id,
+            "gb_id": groupbuy.gb_id
+        }, status=status.HTTP_200_OK)
     # end if
 
     return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
-
 # end def
+
 
 @api_view(['DELETE'])
 @permission_classes((IsAuthenticated,))
@@ -83,7 +96,7 @@ def delete_recipe(request, pk):
     '''
     if request.method == 'DELETE':
         user = request.user
-        try:  
+        try:
             Recipe.recipe_book.filter(owner=user, pk=pk).update(deleted=True)
             return Response({'message': 'Recipe deleted'}, status=status.HTTP_200_OK)
         except Recipe.DoesNotExist:
@@ -93,6 +106,7 @@ def delete_recipe(request, pk):
 
     return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
 # end def
+
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
@@ -104,7 +118,7 @@ def undelete_recipe(request, pk):
     if request.method == 'POST':
         user = request.user
         print(pk)
-        try:  
+        try:
             Recipe.recipe_book.filter(owner=user, pk=pk).update(deleted=False)
             return Response({'message': 'Recipe undeleted'}, status=status.HTTP_200_OK)
         except Recipe.DoesNotExist:
@@ -115,6 +129,7 @@ def undelete_recipe(request, pk):
     return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
 # end def
 
+
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def get_recipes(request):
@@ -123,7 +138,7 @@ def get_recipes(request):
     '''
     if request.method == 'GET':
         user = request.user
-        try:  
+        try:
             recipes = Recipe.recipe_book.filter(owner=user)
             serializer = RecipeSerializer(recipes, many=True)
 

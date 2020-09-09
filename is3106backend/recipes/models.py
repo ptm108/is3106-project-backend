@@ -24,7 +24,7 @@ class Recipe(models.Model):
     recipe_book = models.Manager()
 
     def __str__(self):
-        return f'{self.recipe_name}; {self.date_created}'
+        return f'{self.recipe_name}; {self.date_created.date()}'
     # end def
 
 # end class
