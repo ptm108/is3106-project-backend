@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import GroupBuy
 
+from .models import Groupbuy
 from recipes.serializers import RecipeSerializer
 
 
@@ -9,7 +9,7 @@ class GroupbuySerializer(serializers.ModelSerializer):
     status = serializers.CharField(source='get_status')
 
     class Meta:
-        model = GroupBuy
+        model = Groupbuy
         read_only_fields = (
             'status',
         )

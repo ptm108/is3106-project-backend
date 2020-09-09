@@ -70,7 +70,7 @@ def create_recipe(request):
 
             # create groupbuy associated to this recipe
             groupbuy = Groupbuy(
-                order_by=f_date - timedelta(days=2),  # max order-by date is 2 days before fulfillment date
+                order_by=f_date-timedelta(days=2),  # max order-by date is 2 days before fulfillment date
                 recipe=recipe
             )
             groupbuy.save()
@@ -117,7 +117,6 @@ def undelete_recipe(request, pk):
     '''
     if request.method == 'POST':
         user = request.user
-        print(pk)
         try:
             Recipe.recipe_book.filter(owner=user, pk=pk).update(deleted=False)
             return Response({'message': 'Recipe undeleted'}, status=status.HTTP_200_OK)
