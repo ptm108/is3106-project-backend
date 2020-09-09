@@ -25,7 +25,7 @@ class Groupbuy(models.Model):
 
     # method to get groupbuy status
     def get_status(self):
-        if timezone.now().date() > self.recipe.fulfillment_date: 
+        if timezone.now() > self.fulfillment_date: 
             return "GROUPBUY_EXPIRED" if not self.approval_status else "DELIVERED"
         # end if
 
