@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import CustomUser
+from .models import CustomUser, DeliveryAddress
 
 
 class UserCreationForm(forms.ModelForm):
@@ -96,5 +96,11 @@ class UserAdmin(BaseUserAdmin):
 
 # end class
 
+class DeliveryAddressAdmin(admin.ModelAdmin):
+    list_display = ('deliveryAddress_id', 'user', 'address_line1', 'address_line2', 'postal_code')
+
+# end class
+
 admin.site.register(CustomUser, UserAdmin)
+admin.site.register(DeliveryAddress, DeliveryAddressAdmin)
 admin.site.unregister(Group)
