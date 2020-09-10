@@ -41,7 +41,7 @@ def all_groupbuys(request):
         try:
             # get all params from request, None otherwise
             approved = int(request.query_params.get('approved', 0))  # 1 => approved, -1 => unapproved
-            upcoming = int(request.query_params.get('upcoming', 1))  # 1 => true
+            upcoming = int(request.query_params.get('upcoming', 1))  # 1 => group buys that are ending soonest
 
             # get pagination params from request, default is (10, 1)
             page_size = int(request.query_params.get('pagesize', 10))
@@ -59,6 +59,9 @@ def all_groupbuys(request):
             groupbuys = groupbuys.filter(approval_status=False)
         if search is not None:
             groupbuys = groupbuys.filter(recipe__recipe_name__icontains=search)
+        if upcoming > 0:
+            groupbuys = groupbuys.order_by('-fulfillment_date')
+        # end ifs
 
         # paginator configs
         paginator = PageNumberPagination()
@@ -167,7 +170,7 @@ def create_order(request):
         with transaction.atomic():
             new_order = Order(
                 order_quantity=int(data['order_quantity']),
-                order_price=groupbuy.final_price * float(data['order_quantity']),
+                order_price=float(groupbuy.final_price) * float(data['order_quantity']),
                 delivery_address=delivery_address,
                 buyer=user,
                 groupbuy=groupbuy
@@ -186,3 +189,6 @@ def create_order(request):
 
     return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
 # end def
+
+#get order
+#get all orders
