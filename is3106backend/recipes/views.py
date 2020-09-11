@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.db import transaction
 from rest_framework import status
 from rest_framework.views import APIView
@@ -139,7 +140,19 @@ def get_recipes(request):
         user = request.user
         try:
             recipes = Recipe.recipe_book.filter(owner=user)
-            serializer = RecipeSerializer(recipes, many=True)
+            
+            search = request.GET.get('search')
+            
+            if search is not None:
+                recipes = recipes.filter(recipe_name__icontains=search).order_by('-date_created')
+            
+            paginator = Paginator(recipes, 10)
+            
+            page_number = request.GET.get('page')
+            
+            page_obj = paginator.get_page(page_number)
+
+            serializer = RecipeSerializer(page_obj, many=True)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Recipe.DoesNotExist:
