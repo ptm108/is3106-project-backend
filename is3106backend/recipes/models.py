@@ -13,7 +13,7 @@ class Recipe(models.Model):
     deleted = models.BooleanField(default=False)
 
     # recipe owner, set null when user is deleted
-    owner = models.OneToOneField('users.CustomUser', on_delete=models.SET_NULL, null=True)
+    owner = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True)
 
     # recipe model manager
     recipe_book = models.Manager()
