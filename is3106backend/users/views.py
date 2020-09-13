@@ -143,3 +143,12 @@ def get_delivery_addresses(request):
     # return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
 
 # end def
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def check_session(request):
+    '''
+    Backend endpoint to test validity of JWT
+    '''
+    return Response(status=status.HTTP_200_OK)
+# end def
