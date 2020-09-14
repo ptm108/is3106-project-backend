@@ -75,6 +75,24 @@ def delete_user(request):
 
 # end def
 
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def get_current_user(request):
+    '''
+    Get current user
+    '''
+    if request.method == 'GET':
+        try:  
+            user = CustomUser.objects.get(email=request.user)
+            return Response({'message': 'Current user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name}, status=status.HTTP_200_OK)
+        except CustomUser.DoesNotExist:
+            return Response({'message': 'Current user not found'}, status=status.HTTP_200_OK)
+        # end try-except
+    # end if
+
+    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
+# end def
+
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def create_delivery_address(request):
@@ -111,7 +129,7 @@ def delete_delivery_address(request, pk):
     if request.method == 'DELETE':
         user = request.user
         try:  
-            DeliveryAddress.deliveryAddress_list.filter(user=user, pk=pk).delete()
+            DeliveryAddress.address_list.filter(user=user, pk=pk).delete()
             return Response({'message': 'Delivery address deleted'}, status=status.HTTP_200_OK)
         except DeliveryAddress.DoesNotExist:
             return Response({'message': 'Recipe not found'}, status=status.HTTP_200_OK)
@@ -130,7 +148,7 @@ def get_delivery_addresses(request):
     if request.method == 'GET':
         user = request.user
         try:
-            deliveryAddresses = DeliveryAddress.deliveryAddress_list.filter(user=user)
+            deliveryAddresses = DeliveryAddress.address_list.filter(user=user)
             serializer = DeliveryAddressSerializer(deliveryAddresses, many=True)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
