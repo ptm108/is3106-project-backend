@@ -84,7 +84,11 @@ def get_current_user(request):
     if request.method == 'GET':
         try:  
             user = CustomUser.objects.get(email=request.user)
-            return Response({'message': 'Current user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name}, status=status.HTTP_200_OK)
+            if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
+                vendor = VendorUser.objects.get(user=user)
+            return Response({'message': 'Current user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': vendor.vendor_name, 'is_vendor': vendor.is_vendor}, status=status.HTTP_200_OK)
+        except VendorUser.DoesNotExist:
+            return Response({'message': 'Current user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': None, 'is_vendor': False}, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
             return Response({'message': 'Current user not found'}, status=status.HTTP_200_OK)
         # end try-except
