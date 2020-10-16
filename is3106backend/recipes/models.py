@@ -31,6 +31,7 @@ class Ingredient(models.Model):
     ing_name = models.CharField(max_length=200)
     image_url = models.URLField(max_length=300)
     category = models.CharField(max_length=100)
+    quantity = models.CharField(max_length=100, default="")
     metadata = models.JSONField()  # stores metadata json from vendor
 
     # recipe ref

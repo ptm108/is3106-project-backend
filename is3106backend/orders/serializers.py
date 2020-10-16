@@ -34,17 +34,3 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = '__all__'
     # end Meta class
 # end class
-
-class OrderSerializer(serializers.ModelSerializer):
-    groupbuy = GroupbuySerializer()
-    delivery_address = DeliveryAddressSerializer()
-
-    class Meta:
-        model = Order
-        read_only_fields = (
-            'groupbuy',
-            'delivery_address',
-        )
-        fields = '__all__'
-    # end Meta class
-# end class
