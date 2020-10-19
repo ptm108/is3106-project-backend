@@ -32,6 +32,8 @@ class Ingredient(models.Model):
     image_url = models.URLField(max_length=300)
     category = models.CharField(max_length=100)
     quantity = models.CharField(max_length=100, default="")
+    selling_price = models.DecimalField(decimal_places=2, max_digits=6)
+    estimated_price = models.DecimalField(decimal_places=2, max_digits=6)
     metadata = models.JSONField()  # stores metadata json from vendor
 
     # recipe ref

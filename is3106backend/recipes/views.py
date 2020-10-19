@@ -61,6 +61,9 @@ def create_recipe(request):
                     ing_name=ing['ing_name'],
                     image_url=ing['image_url'],
                     category=ing['category'],
+                    quantity=ing['quantity'],
+                    selling_price=ing['selling_price'],
+                    estimated_price=ing['estimated_price'],
                     metadata=json.dumps(ing['metadata']),
                     recipe=recipe
                 )
