@@ -5,7 +5,7 @@ from .models import CustomUser, DeliveryAddress
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'is_active', 'date_joined', 'name']
+        fields = ['id', 'email', 'is_active', 'date_joined', 'name', 'vendor_name', 'is_vendor']
     # end class
     
 # end class
