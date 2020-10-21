@@ -34,7 +34,7 @@ urlpatterns = [
     path('recipes/', include('recipes.urls')),
 
     # orders endpoints
-    path('orders/', include('orders.urls')),
+    path('groupbuys', include('orders.urls')),
 
     # rest framework end points
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
