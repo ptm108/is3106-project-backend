@@ -31,7 +31,7 @@ urlpatterns = [
     path('auth/', include('users.urls')),
 
     # recipe endpoints
-    path('recipes/', include('recipes.urls')),
+    path('recipes', include('recipes.urls')),
 
     # orders endpoints
     path('groupbuys', include('orders.urls')),
