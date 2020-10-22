@@ -1,4 +1,7 @@
 from django.db import transaction
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
@@ -47,6 +50,76 @@ def create_user(request):
 
 # end def
 
+@api_view(['PATCH'])
+@permission_classes((IsAuthenticated,))
+def update_user(request, pk):
+    """
+    Updates user profile
+    """
+
+    if request.method == 'PATCH' :
+        content = {"message": "Successfully updated"}
+        data = request.data  # {'email': 'd@d.com', 'password': 'password2'}
+
+        try:
+            name, email, vendor_name = data['name'], data['email'], data['vendor_name']
+        except ValueError:
+            return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(pk=pk)
+            if name: user.name = name
+            if email: user.email = email
+            if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
+                vendor = VendorUser.objects.get(user=user)
+                if vendor_name: vendor.vendor_name = vendor_name
+                vendor.save()
+            user.save() 
+
+            # serializer = CustomUserSerializer(user)
+            return Response(content, status=status.HTTP_200_OK)
+        except CustomUser.DoesNotExist:
+            return Response({'message': 'User profile not found'}, status=status.HTTP_400_BAD_REQUEST)    
+        # end try-except
+
+    # end if
+
+    return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+# end def
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def change_user_password(request, pk):
+    
+    if request.method == 'POST':
+        data = request.data
+        try:
+            old_password, new_password1, new_password2 = data['old_password'], data['new_password1'], data['new_password2']
+        except ValueError:
+            return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = CustomUser.objects.get(pk=pk)
+
+            currentpassword= user.password # user's current password
+            matchcheck = check_password(old_password, currentpassword)
+
+            if matchcheck:
+                if new_password1 == new_password2:
+                    user.set_password(new_password1)
+                    user.save()
+                else:
+                    return Response({'message': 'new password does not match retype password'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'password updated'}, status=status.HTTP_200_OK)   
+            return Response({'message': 'check values'}, status=status.HTTP_400_BAD_REQUEST)    
+        except CustomUser.DoesNotExist:
+            return Response({'message': 'User profile not found'}, status=status.HTTP_400_BAD_REQUEST)    
+    
+        # end try-except
+
+        # end if
+
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_user(request):
@@ -86,7 +159,7 @@ def get_current_user(request):
             user = CustomUser.objects.get(email=request.user)
             if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
                 vendor = VendorUser.objects.get(user=user)
-            return Response({'message': 'Current user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': vendor.vendor_name, 'is_vendor': vendor.is_vendor}, status=status.HTTP_200_OK)
+            return Response({'message': 'Current vendor user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': vendor.vendor_name, 'is_vendor': vendor.is_vendor}, status=status.HTTP_200_OK)
         except VendorUser.DoesNotExist:
             return Response({'message': 'Current user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': None, 'is_vendor': False}, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
