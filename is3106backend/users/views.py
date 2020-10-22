@@ -23,7 +23,8 @@ class HelloView(APIView):
 
 @api_view(['POST'])
 @permission_classes((AllowAny,))
-def create_user(request):
+def user_view(request):
+    
     """
     Creates a new application user
     """
@@ -46,83 +47,30 @@ def create_user(request):
 
     # end if
 
-    return Response({}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
 
 # end def
 
-@api_view(['PATCH'])
+
+@api_view(['GET', 'DELETE'])
 @permission_classes((IsAuthenticated,))
-def update_user(request, pk):
-    """
-    Updates user profile
-    """
-
-    if request.method == 'PATCH' :
-        content = {"message": "Successfully updated"}
-        data = request.data  # {'email': 'd@d.com', 'password': 'password2'}
-
-        try:
-            name, email, vendor_name = data['name'], data['email'], data['vendor_name']
-        except ValueError:
-            return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user = CustomUser.objects.get(pk=pk)
-            if name: user.name = name
-            if email: user.email = email
+def protected_user_view(request):
+    '''
+    Get current user
+    '''
+    if request.method == 'GET':
+        try:  
+            user = CustomUser.objects.get(email=request.user)
             if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
                 vendor = VendorUser.objects.get(user=user)
-                if vendor_name: vendor.vendor_name = vendor_name
-                vendor.save()
-            user.save() 
-
-            # serializer = CustomUserSerializer(user)
-            return Response(content, status=status.HTTP_200_OK)
+            return Response({'message': 'Current vendor user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': vendor.vendor_name, 'is_vendor': vendor.is_vendor}, status=status.HTTP_200_OK)
+        except VendorUser.DoesNotExist:
+            return Response({'message': 'Current user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': None, 'is_vendor': False}, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
-            return Response({'message': 'User profile not found'}, status=status.HTTP_400_BAD_REQUEST)    
+            return Response({'message': 'Current user not found'}, status=status.HTTP_200_OK)
         # end try-except
-
     # end if
 
-    return Response({}, status=status.HTTP_400_BAD_REQUEST)
-
-# end def
-
-@api_view(['POST'])
-@permission_classes((IsAuthenticated,))
-def change_user_password(request, pk):
-    
-    if request.method == 'POST':
-        data = request.data
-        try:
-            old_password, new_password1, new_password2 = data['old_password'], data['new_password1'], data['new_password2']
-        except ValueError:
-            return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            user = CustomUser.objects.get(pk=pk)
-
-            currentpassword= user.password # user's current password
-            matchcheck = check_password(old_password, currentpassword)
-
-            if matchcheck:
-                if new_password1 == new_password2:
-                    user.set_password(new_password1)
-                    user.save()
-                else:
-                    return Response({'message': 'new password does not match retype password'}, status=status.HTTP_400_BAD_REQUEST)
-                return Response({'message': 'password updated'}, status=status.HTTP_200_OK)   
-            return Response({'message': 'check values'}, status=status.HTTP_400_BAD_REQUEST)    
-        except CustomUser.DoesNotExist:
-            return Response({'message': 'User profile not found'}, status=status.HTTP_400_BAD_REQUEST)    
-    
-        # end try-except
-
-        # end if
-
-
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def delete_user(request):
     """
     Marks user as deleted when called
     """
@@ -146,33 +94,97 @@ def delete_user(request):
 
     # end if
 
+    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
+
 # end def
 
-@api_view(['GET'])
+
+@api_view(['PATCH', 'POST'])
 @permission_classes((IsAuthenticated,))
-def get_current_user(request):
-    '''
-    Get current user
-    '''
-    if request.method == 'GET':
-        try:  
-            user = CustomUser.objects.get(email=request.user)
+def protected_user_update_view(request, pk):
+    
+    """
+    Updates user profile
+    """
+
+    if request.method == 'PATCH' :
+        content = {"message": "Successfully updated"}
+        data = request.data  # {'email': 'd@d.com', 'password': 'password2'}
+
+        try:
+            name, email, vendor_name = data['name'], data['email'], data['vendor_name']
+        except ValueError:
+            return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(pk=pk)
+            if name: user.name = name
+            if email: user.email = email
             if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
                 vendor = VendorUser.objects.get(user=user)
-            return Response({'message': 'Current vendor user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': vendor.vendor_name, 'is_vendor': vendor.is_vendor}, status=status.HTTP_200_OK)
-        except VendorUser.DoesNotExist:
-            return Response({'message': 'Current user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': None, 'is_vendor': False}, status=status.HTTP_200_OK)
+                if vendor_name: vendor.vendor_name = vendor_name
+                vendor.save()
+            user.save() 
+
+            # end if
+
+            return Response(content, status=status.HTTP_200_OK)
+
         except CustomUser.DoesNotExist:
-            return Response({'message': 'Current user not found'}, status=status.HTTP_200_OK)
+            return Response({'message': 'User profile not found'}, status=status.HTTP_400_BAD_REQUEST)    
+
         # end try-except
+
+    # end if
+
+    """
+    Change user password
+    """
+    if request.method == 'POST':
+        data = request.data
+        try:
+            old_password, new_password1, new_password2 = data['old_password'], data['new_password1'], data['new_password2']
+        except ValueError:
+            return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # end try-except
+
+        try:
+            user = CustomUser.objects.get(pk=pk)
+
+            currentpassword= user.password # user's current password
+            matchcheck = check_password(old_password, currentpassword)
+
+            if matchcheck:
+                if new_password1 == new_password2:
+                    user.set_password(new_password1)
+                    user.save()
+                else:
+                    return Response({'message': 'new password does not match retype password'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # end if else statement make sure new and retype password is the same 
+                    
+                return Response({'message': 'password updated'}, status=status.HTTP_200_OK)
+
+            # end if statement to check if encoded password is the same as user inputted password
+
+            return Response({'message': 'check values'}, status=status.HTTP_400_BAD_REQUEST)    
+        except CustomUser.DoesNotExist:
+            return Response({'message': 'User profile not found'}, status=status.HTTP_400_BAD_REQUEST)    
+    
+        # end try-except
+
     # end if
 
     return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
+
 # end def
 
-@api_view(['POST'])
+
+@api_view(['POST', 'GET'])
 @permission_classes((IsAuthenticated,))
-def create_delivery_address(request):
+def protected_user_delivery_address_view(request):
+    
     """
     Creates a new delivery address
     """
@@ -193,32 +205,6 @@ def create_delivery_address(request):
         return Response({'message': 'Delivery Address created', 'add_id': deliveryAddress.add_id}, status=status.HTTP_200_OK)
     # end if
 
-    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
-
-# end def
-
-@api_view(['DELETE'])
-@permission_classes((IsAuthenticated,))
-def delete_delivery_address(request, pk):
-    '''
-    Deletes a delivery address
-    '''
-    if request.method == 'DELETE':
-        user = request.user
-        try:  
-            DeliveryAddress.address_list.filter(user=user, pk=pk).delete()
-            return Response({'message': 'Delivery address deleted'}, status=status.HTTP_200_OK)
-        except DeliveryAddress.DoesNotExist:
-            return Response({'message': 'Recipe not found'}, status=status.HTTP_200_OK)
-        # end try-except
-    # end if
-
-    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
-# end def
-
-@api_view(['GET'])
-@permission_classes((IsAuthenticated,))
-def get_delivery_addresses(request):
     '''
     Retrieves all delivery addresses created by user making request
     '''
@@ -235,9 +221,29 @@ def get_delivery_addresses(request):
 
     # end if
 
-    # return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
 
 # end def
+
+@api_view(['DELETE'])
+@permission_classes((IsAuthenticated,))
+def protected_user_delivery_address_delete_view(request, pk):
+    '''
+    Deletes a delivery address
+    '''
+    if request.method == 'DELETE':
+        user = request.user
+        try:  
+            DeliveryAddress.address_list.filter(user=user, pk=pk).delete()
+            return Response({'message': 'Delivery address deleted'}, status=status.HTTP_200_OK)
+        except DeliveryAddress.DoesNotExist:
+            return Response({'message': 'Recipe not found'}, status=status.HTTP_200_OK)
+        # end try-except
+    # end if
+
+    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
+# end def
+
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
