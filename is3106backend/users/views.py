@@ -55,9 +55,9 @@ def user_view(request):
 # end def
 
 
-@api_view(['GET', 'DELETE'])
+@api_view(['GET', 'DELETE', 'PATCH', 'POST'])
 @permission_classes((IsAuthenticated,))
-def protected_user_view(request):
+def protected_user_view(request, pk):
     '''
     Get current user
     '''
@@ -97,15 +97,6 @@ def protected_user_view(request):
 
     # end if
 
-    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
-
-# end def
-
-
-@api_view(['PATCH', 'POST'])
-@permission_classes((IsAuthenticated,))
-def protected_user_update_view(request, pk):
-    
     """
     Updates user profile
     """
@@ -123,13 +114,17 @@ def protected_user_update_view(request, pk):
             user = CustomUser.objects.get(pk=pk)
             if name: user.name = name
             if email: user.email = email
-            if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
-                vendor = VendorUser.objects.get(user=user)
-                if vendor_name: vendor.vendor_name = vendor_name
-                vendor.save()
+            try:
+                if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
+                    vendor = VendorUser.objects.get(user=user)
+                    if vendor_name: vendor.vendor_name = vendor_name
+                    vendor.save()
+                # end if
+            except VendorUser.DoesNotExist:
+                user.save()
             user.save() 
 
-            # end if
+            # try except
 
             return Response(content, status=status.HTTP_200_OK)
 
@@ -186,7 +181,7 @@ def protected_user_update_view(request, pk):
 
 @api_view(['POST', 'GET'])
 @permission_classes((IsAuthenticated,))
-def protected_user_delivery_address_view(request):
+def protected_user_delivery_address_view(request, pk):
     
     """
     Creates a new delivery address
@@ -230,14 +225,14 @@ def protected_user_delivery_address_view(request):
 
 @api_view(['DELETE'])
 @permission_classes((IsAuthenticated,))
-def protected_user_delivery_address_delete_view(request, pk):
+def protected_user_delivery_address_delete_view(request, pk, jk):
     '''
     Deletes a delivery address
     '''
     if request.method == 'DELETE':
         user = request.user
         try:  
-            DeliveryAddress.address_list.filter(user=user, pk=pk).delete()
+            DeliveryAddress.address_list.filter(user=user, pk=jk).delete()
             return Response({'message': 'Delivery address deleted'}, status=status.HTTP_200_OK)
         except DeliveryAddress.DoesNotExist:
             return Response({'message': 'Recipe not found'}, status=status.HTTP_200_OK)
