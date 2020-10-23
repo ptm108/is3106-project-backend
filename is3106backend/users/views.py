@@ -35,6 +35,9 @@ def user_view(request):
 
         with transaction.atomic():
             user = CustomUser.objects.create_user(data['email'], data['password'])
+            if 'name' in data: 
+                name = data['name']
+                if name: user.name = name
             user.save()
 
             if 'vendor_name' in data:

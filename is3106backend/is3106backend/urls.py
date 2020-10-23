@@ -28,7 +28,7 @@ urlpatterns = [
 
     # authentication endpoints
     path('admin/', admin.site.urls),
-    path('auth', include('users.urls')),
+    path('users', include('users.urls')),
 
     # recipe endpoints
     path('recipes', include('recipes.urls')),
