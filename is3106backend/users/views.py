@@ -38,11 +38,16 @@ def user_view(request):
             if 'name' in data: 
                 name = data['name']
                 if name: user.name = name
+            
+            # end if
+
             user.save()
 
             if 'vendor_name' in data:
                 vendor = VendorUser(user=user, vendor_name=data['vendor_name'], is_vendor=True)
                 vendor.save()
+
+            # end if
 
             return Response(content, status=status.HTTP_201_CREATED)
 
@@ -103,26 +108,27 @@ def protected_user_view(request, pk):
 
     if request.method == 'PATCH' :
         content = {"message": "Successfully updated"}
-        data = request.data  # {'email': 'd@d.com', 'password': 'password2'}
+        data = request.data 
 
         try:
             name, email, vendor_name = data['name'], data['email'], data['vendor_name']
         except KeyError:
             return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # end try except
+
         try:
             user = CustomUser.objects.get(pk=pk)
             user.name = name
             user.email = email
-            try:
+            user.save()
+            
+            if vendor_name:
                 vendor = VendorUser.objects.get(user=user)
-                if vendor_name: vendor.vendor_name = vendor_name
+                vendor.vendor_name = vendor_name
                 vendor.save()
-            except VendorUser.DoesNotExist:
-                user.save()
-            user.save() 
 
-            # try except
+            # end if
 
             return Response(content, status=status.HTTP_200_OK)
 
