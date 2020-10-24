@@ -3,14 +3,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-  path('', views.HelloView.as_view(), name='hello'),
-  path('create_user', views.create_user, name='create user'),
-  path('delete_user', views.delete_user, name='delete user'),
-  path('get_current_user', views.get_current_user, name='get details of current user'),
-  path('create_delivery_address', views.create_delivery_address, name='create a delivery address'),
-  path('delete_delivery_address/<slug:pk>', views.delete_delivery_address, name='delete a delivery address'),
-  path('get_delivery_addresses', views.get_delivery_addresses, name='get user delivery addresses'),
-  path('check_session', views.check_session, name='check validity of jwt'), 
-  path('update_user/<slug:pk>', views.update_user, name='update users profile'),
-  path('change_user_password/<slug:pk>', views.change_user_password, name='change users password')
+  path('', views.user_view, name='create user'),
+  path('/<slug:pk>', views.protected_user_view, name=' get, delete, update users profile and change password'),
+  path('/<slug:pk>/delivery-address', views.protected_user_delivery_address_view, name='create a delivery address and get all delivery addresses'),
+  path('/<slug:pk>/delivery-address/<slug:da_id>', views.protected_user_delivery_address_delete_view, name='delete a delivery address'),
+  path('/check_session', views.check_session, name='check validity of jwt'), 
 ]

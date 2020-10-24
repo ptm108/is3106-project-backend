@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 
 from .models import Groupbuy, Order
 from .serializers import GroupbuySerializer
@@ -27,7 +27,7 @@ class DefaultView(APIView):
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
-def all_groupbuys(request):
+def groupbuy_view(request):
     """
     Retrieves all groupbuys
     Supports search (name), filtering (approved, upcoming), 
@@ -74,18 +74,33 @@ def all_groupbuys(request):
         return paginator.get_paginated_response(serializer.data)
     # end if
 
-    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 # end def
 
 
-@api_view(['PATCH'])
-@permission_classes((IsAuthenticated,))
-def approve_groupbuy(request, pk):
+@api_view(['GET', 'PATCH', 'PUT'])
+@permission_classes((IsAuthenticatedOrReadOnly,))
+def protected_groupbuy_view(request, pk):
+    """
+    Retrieves a single groupbuy based on id
+    """
+    if request.method == 'GET':
+        try:
+            groupbuy = Groupbuy.groupbuys.get(pk=pk)
+            
+            serializer = GroupbuySerializer(groupbuy)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Groupbuy.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        # end try-except
+    # end if
+
+    
     """
     Toggles groupbuy's approval status and assigned vendor to groupbuy
     Only accessible by vendors
     """
-
     if request.method == 'PATCH':
         vendor = request.user
 
@@ -102,25 +117,17 @@ def approve_groupbuy(request, pk):
                 'approval_status': groupbuy.approval_status
             }, status=status.HTTP_200_OK)
         except Groupbuy.DoesNotExist:
-            return Response({'message': 'Groupbuy not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_404_NOT_FOUND)
         # end try-except
     # end if
 
-    return Response({'message': 'Unsupported'}, status=status.HTTP_400_BAD_REQUEST)
-# end def
-
-
-@api_view(['PATCH'])
-@permission_classes((IsAuthenticated,))
-def update_groupbuy(request, pk):
     """
     Updates groupbuy minimum order quantity, order by date, final price
     Only accessible by vendors
     """
+    if request.method == 'PUT':
+        data = request.data
 
-    data = request.data
-
-    if request.method == 'PATCH':
         try:
             moq, order_by, final_price = int(data['minimum_order_quantity']), datetime.strptime(data['order_by'], '%Y-%m-%d'), float(data['final_price'])
         except ValueError:
@@ -135,30 +142,30 @@ def update_groupbuy(request, pk):
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Groupbuy.DoesNotExist:
-            return Response({'message': 'Groupbuy not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_404_NOT_FOUND)
         # end try-except
     # end if
 
-    return Response({'message': 'Unsupported'}, status=status.HTTP_400_BAD_REQUEST)
-# end def
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+#end def
 
 
-@api_view(['POST', 'PATCH'])
+@api_view(['POST'])
 @permission_classes((IsAuthenticated,))
-def create_order(request):
+def protected_order_view(request, pk):
+    
     """
     Creates a new order
     """
-
-    user = request.user
-    data = request.data
-
     if request.method == 'POST':
+        user = request.user
+        data = request.data
+
         try:
             delivery_address = DeliveryAddress.address_list.get(pk=data['add_id'])
             groupbuy = Groupbuy.groupbuys.get(pk=data['gb_id'])
         except ObjectDoesNotExist:
-            return Response({'message': 'Check your Groupbuy and Address ids'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Check your Groupbuy and Address ids'}, status=status.HTTP_404_NOT_FOUND)
         # end try-except
 
         # check if groupbuy status
@@ -187,8 +194,9 @@ def create_order(request):
         # end with
     # end if
 
-    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'message': 'Unsupported'}, status=status.HTTP_400_BAD_REQUEST)
 # end def
+
 
 #get order
 #get all orders

@@ -101,6 +101,10 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
 }
 
+# Silence warnings
+
+SILENCED_SYSTEM_CHECKS = ["urls.W002"]
+
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

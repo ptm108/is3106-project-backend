@@ -26,13 +26,40 @@ class DefaultView(APIView):
 # end class
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST', 'DELETE'])
 @permission_classes((IsAuthenticated,))
-def create_recipe(request):
+def protected_recipe_view(request):
+    '''
+    Retrieves all recipes created by user making request
+    '''
+    if request.method == 'GET':
+        user = request.user
+        try:
+            recipes = Recipe.recipe_book.filter(owner=user)
+            
+            search = request.GET.get('search')
+            
+            if search is not None:
+                recipes = recipes.filter(recipe_name__icontains=search).order_by('-date_created')
+            
+            paginator = Paginator(recipes, 10)
+            
+            page_number = request.GET.get('page')
+            
+            page_obj = paginator.get_page(page_number)
+
+            serializer = RecipeSerializer(page_obj, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Recipe.DoesNotExist:
+            return Response({'message': 'No recipes found'}, status=status.HTTP_200_OK)
+        # end try-except
+    # end if
+
+
     """
     Creates a new recipe and required ingredients
     """
-
     if request.method == 'POST':
         user = request.user
         data = request.data
@@ -116,6 +143,7 @@ def delete_recipe(request, pk):
 @permission_classes((IsAuthenticated,))
 def undelete_recipe(request, pk):
     '''
+    EXPERIMENTAL METHOD
     Undeletes a recipe
     No effect on group buys
     '''
@@ -126,40 +154,6 @@ def undelete_recipe(request, pk):
             return Response({'message': 'Recipe undeleted'}, status=status.HTTP_200_OK)
         except Recipe.DoesNotExist:
             return Response({'message': 'Recipe not found'}, status=status.HTTP_200_OK)
-        # end try-except
-    # end if
-
-    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
-# end def
-
-
-@api_view(['GET'])
-@permission_classes((IsAuthenticated,))
-def get_recipes(request):
-    '''
-    Retrieves all recipes created by user making request
-    '''
-    if request.method == 'GET':
-        user = request.user
-        try:
-            recipes = Recipe.recipe_book.filter(owner=user)
-            
-            search = request.GET.get('search')
-            
-            if search is not None:
-                recipes = recipes.filter(recipe_name__icontains=search).order_by('-date_created')
-            
-            paginator = Paginator(recipes, 10)
-            
-            page_number = request.GET.get('page')
-            
-            page_obj = paginator.get_page(page_number)
-
-            serializer = RecipeSerializer(page_obj, many=True)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Recipe.DoesNotExist:
-            return Response({'message': 'No recipes found'}, status=status.HTTP_200_OK)
         # end try-except
     # end if
 
