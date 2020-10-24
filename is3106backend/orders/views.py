@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 
 from .models import Groupbuy, Order
 from .serializers import GroupbuySerializer
@@ -77,9 +77,10 @@ def groupbuy_view(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 # end def
 
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-def groupbuy_single_view(request, pk):
+
+@api_view(['GET', 'PATCH', 'PUT'])
+@permission_classes((IsAuthenticatedOrReadOnly,))
+def protected_groupbuy_view(request, pk):
     """
     Retrieves a single groupbuy based on id
     """
@@ -95,13 +96,6 @@ def groupbuy_single_view(request, pk):
         # end try-except
     # end if
 
-    return Response(status=status.HTTP_400_BAD_REQUEST)
-# end def
-
-
-@api_view(['PATCH', 'PUT'])
-@permission_classes((IsAuthenticated,))
-def protected_groupbuy_view(request, pk):
     
     """
     Toggles groupbuy's approval status and assigned vendor to groupbuy
@@ -131,7 +125,7 @@ def protected_groupbuy_view(request, pk):
     Updates groupbuy minimum order quantity, order by date, final price
     Only accessible by vendors
     """
-    if request.method == 'PATCH':
+    if request.method == 'PUT':
         data = request.data
 
         try:
