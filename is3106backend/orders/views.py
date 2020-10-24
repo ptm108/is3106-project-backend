@@ -171,7 +171,7 @@ def protected_order_view(request, pk):
             delivery_address = DeliveryAddress.address_list.get(pk=data['add_id'])
             groupbuy = Groupbuy.groupbuys.get(pk=data['gb_id'])
         except ObjectDoesNotExist:
-            return Response({'message': 'Check your Groupbuy and Address ids'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Check your Groupbuy and Address ids'}, status=status.HTTP_404_NOT_FOUND)
         # end try-except
 
         # check if groupbuy status
