@@ -74,8 +74,30 @@ def groupbuy_view(request):
         return paginator.get_paginated_response(serializer.data)
     # end if
 
-    return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 # end def
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def groupbuy_single_view(request, pk):
+    """
+    Retrieves a single groupbuy based on id
+    """
+    if request.method == 'GET':
+        try:
+            groupbuy = Groupbuy.groupbuys.get(pk=pk)
+            
+            serializer = GroupbuySerializer(groupbuy)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Groupbuy.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        # end try-except
+    # end if
+
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+# end def
+
 
 @api_view(['PATCH', 'PUT'])
 @permission_classes((IsAuthenticated,))
@@ -101,7 +123,7 @@ def protected_groupbuy_view(request, pk):
                 'approval_status': groupbuy.approval_status
             }, status=status.HTTP_200_OK)
         except Groupbuy.DoesNotExist:
-            return Response({'message': 'Groupbuy not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_404_NOT_FOUND)
         # end try-except
     # end if
 
@@ -126,11 +148,11 @@ def protected_groupbuy_view(request, pk):
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Groupbuy.DoesNotExist:
-            return Response({'message': 'Groupbuy not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_404_NOT_FOUND)
         # end try-except
     # end if
 
-    return Response({'message': 'Unsupported'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 #end def
 
 
