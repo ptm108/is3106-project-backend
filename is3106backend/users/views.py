@@ -107,19 +107,17 @@ def protected_user_view(request, pk):
 
         try:
             name, email, vendor_name = data['name'], data['email'], data['vendor_name']
-        except ValueError:
+        except KeyError:
             return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = CustomUser.objects.get(pk=pk)
-            if name: user.name = name
-            if email: user.email = email
+            user.name = name
+            user.email = email
             try:
-                if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
-                    vendor = VendorUser.objects.get(user=user)
-                    if vendor_name: vendor.vendor_name = vendor_name
-                    vendor.save()
-                # end if
+                vendor = VendorUser.objects.get(user=user)
+                if vendor_name: vendor.vendor_name = vendor_name
+                vendor.save()
             except VendorUser.DoesNotExist:
                 user.save()
             user.save() 
@@ -225,14 +223,14 @@ def protected_user_delivery_address_view(request, pk):
 
 @api_view(['DELETE'])
 @permission_classes((IsAuthenticated,))
-def protected_user_delivery_address_delete_view(request, pk, jk):
+def protected_user_delivery_address_delete_view(request, pk, da_id):
     '''
     Deletes a delivery address
     '''
     if request.method == 'DELETE':
         user = request.user
         try:  
-            DeliveryAddress.address_list.filter(user=user, pk=jk).delete()
+            DeliveryAddress.address_list.filter(user=user, pk=da_id).delete()
             return Response({'message': 'Delivery address deleted'}, status=status.HTTP_200_OK)
         except DeliveryAddress.DoesNotExist:
             return Response({'message': 'Recipe not found'}, status=status.HTTP_200_OK)
