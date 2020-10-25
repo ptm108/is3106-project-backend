@@ -21,7 +21,7 @@ class HelloView(APIView):
     # end def
 # end class
 
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 @permission_classes((AllowAny,))
 def user_view(request):
     
@@ -53,6 +53,22 @@ def user_view(request):
 
         # end with
 
+    # end if
+
+    '''
+    Get current user
+    '''
+    if request.method == 'GET':
+        try:  
+            user = CustomUser.objects.get(email=request.user)
+            if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
+                vendor = VendorUser.objects.get(user=user)
+            return Response({'message': 'Current vendor user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': vendor.vendor_name, 'is_vendor': vendor.is_vendor}, status=status.HTTP_200_OK)
+        except VendorUser.DoesNotExist:
+            return Response({'message': 'Current user details retrieved', 'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name,'vendor_name': None, 'is_vendor': False}, status=status.HTTP_200_OK)
+        except CustomUser.DoesNotExist:
+            return Response({'message': 'Current user not found'}, status=status.HTTP_200_OK)
+        # end try-except
     # end if
 
     return Response({'message': 'Request Declined'}, status=status.HTTP_400_BAD_REQUEST)
