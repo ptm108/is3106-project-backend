@@ -89,9 +89,8 @@ def protected_user_view(request, pk):
 
             return Response(content, status=status.HTTP_200_OK)
 
-        except CustomUser.DoesNotExists:
-            content.message = 'Unsuccessful'
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        except CustomUser.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         # end try-except
 
     # end if
@@ -101,30 +100,25 @@ def protected_user_view(request, pk):
     """
 
     if request.method == 'PATCH' :
-        content = {"message": "Successfully updated"}
         data = request.data 
 
         try:
-            name, email, vendor_name = data['name'], data['email'], data['vendor_name']
-        except KeyError:
-            return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # end try except
-
-        try:
             user = CustomUser.objects.get(pk=pk)
-            user.name = name
-            user.email = email
+            if hasattr(data, 'name'): user.name = data['name']
+            if hasattr(data, 'email'): user.email = data['email']
+            if hasattr(data, 'contact_number'): user.contact_number = data['contact_number']
             user.save()
             
-            if vendor_name:
-                vendor = VendorUser.objects.get(user=user)
-                vendor.vendor_name = vendor_name
-                vendor.save()
-
+            if hasattr(data, 'vendor_name'):
+                try:
+                    vendor = VendorUser.objects.get(user=user)
+                    vendor.vendor_name = data['vendor_name']
+                    vendor.save()
+                except VendorUser.DoesNotExist:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
             # end if
 
-            return Response(content, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
 
         except CustomUser.DoesNotExist:
             return Response({'message': 'User profile not found'}, status=status.HTTP_400_BAD_REQUEST)    
