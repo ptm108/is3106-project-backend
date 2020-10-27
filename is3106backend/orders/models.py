@@ -14,6 +14,7 @@ class Groupbuy(models.Model):
     order_by = models.DateTimeField()
     final_price = models.DecimalField(decimal_places=2, max_digits=6, null=True, blank=True)
     fulfillment_date = models.DateTimeField(default=timezone.now()+timedelta(days=7))
+    delivery_fee = models.DecimalField(decimal_places=2, max_digits=6, default=None, null=True)
 
     # Recipe ref, set null when recipe is deleted
     recipe = models.OneToOneField(Recipe, on_delete=models.SET_NULL, null=True)
@@ -45,7 +46,6 @@ class Order(models.Model):
     order_date = models.DateTimeField(default=timezone.now, editable=False)
     order_quantity = models.PositiveSmallIntegerField()
     order_price = models.DecimalField(decimal_places=2, max_digits=6)
-    delivery_fee = models.DecimalField(decimal_places=2, max_digits=6, default=None, null=True)
     contact_number = models.CharField(max=15, null=True)
 
     # user who placed order, deleted when user is deleted

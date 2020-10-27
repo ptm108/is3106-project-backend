@@ -164,7 +164,7 @@ def protected_order_view(request, pk):
         try:
             delivery_address = DeliveryAddress.address_list.get(pk=data['add_id'])
             groupbuy = Groupbuy.groupbuys.get(pk=data['gb_id'])
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValueError):
             return Response({'message': 'Check your Groupbuy and Address ids'}, status=status.HTTP_404_NOT_FOUND)
         # end try-except
 
@@ -175,17 +175,22 @@ def protected_order_view(request, pk):
 
         # start atomic transaction to create order
         with transaction.atomic():
-            new_order = Order(
-                order_quantity=int(data['order_quantity']),
-                order_price=float(groupbuy.final_price) * float(data['order_quantity']),
-                delivery_address=delivery_address,
-                buyer=user,
-                groupbuy=groupbuy
-            )
-            new_order.save()
+            try:
+                new_order = Order(
+                    order_quantity=int(data['order_quantity']),
+                    order_price=float(groupbuy.final_price) * float(data['order_quantity']),
+                    delivery_address=delivery_address,
+                    contact_number=data['contact_number'],
+                    buyer=user,
+                    groupbuy=groupbuy
+                )
+                new_order.save()
 
-            groupbuy.current_order_quantity = groupbuy.current_order_quantity + int(data['order_quantity'])
-            groupbuy.save()
+                groupbuy.current_order_quantity = groupbuy.current_order_quantity + int(data['order_quantity'])
+                groupbuy.save()
+            except ValueError:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            # end try-except
 
             return Response({
                 'message': 'Order created',
