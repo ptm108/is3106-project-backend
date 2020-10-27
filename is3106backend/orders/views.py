@@ -129,13 +129,13 @@ def protected_groupbuy_view(request, pk):
         data = request.data
 
         try:
-            moq, order_by, final_price = int(data['minimum_order_quantity']), datetime.strptime(data['order_by'], '%Y-%m-%d'), float(data['final_price'])
-        except ValueError:
+            moq, order_by, final_price, delivery_fee = int(data['minimum_order_quantity']), datetime.strptime(data['order_by'], '%Y-%m-%d'), float(data['final_price']), float(data['delivery_fee'])
+        except (ValueError, KeyError):
             return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
         # end try-except
 
         try:
-            Groupbuy.groupbuys.filter(pk=pk).update(minimum_order_quantity=moq, order_by=order_by, final_price=final_price)
+            Groupbuy.groupbuys.filter(pk=pk).update(minimum_order_quantity=moq, order_by=order_by, final_price=final_price, delivery_fee=delivery_fee)
             groupbuy = Groupbuy.groupbuys.get(pk=pk)
             
             serializer = GroupbuySerializer(groupbuy)
