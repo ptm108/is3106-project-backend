@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.utils import IntegrityError
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -34,17 +35,21 @@ def user_view(request):
         data = request.data  # {'email': 'd@d.com', 'password': 'password2'}
 
         with transaction.atomic():
-            user = CustomUser.objects.create_user(data['email'], data['password'])
-            if hasattr(data, 'name') and data['name'] is not None:
-                user.name = data['name']
-            # end if
+            try:
+                user = CustomUser.objects.create_user(data['email'], data['password'])
+                if hasattr(data, 'name') and data['name'] is not None:
+                    user.name = data['name']
+                # end if
 
-            user.save()
+                user.save()
 
-            if 'vendor_name' in data:
-                vendor = VendorUser(user=user, vendor_name=data['vendor_name'], is_vendor=True)
-                vendor.save()
-            # end if
+                if 'vendor_name' in data:
+                    vendor = VendorUser(user=user, vendor_name=data['vendor_name'], is_vendor=True)
+                    vendor.save()
+                # end if
+            except IntegrityError:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            # end try-except
 
             return Response(content, status=status.HTTP_201_CREATED)
         # end with
