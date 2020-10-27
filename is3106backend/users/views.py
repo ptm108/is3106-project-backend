@@ -59,7 +59,7 @@ def user_view(request):
 # end def
 
 
-@api_view(['GET', 'DELETE', 'PATCH', 'POST'])
+@api_view(['GET', 'DELETE', 'PATCH', 'PUT'])
 @permission_classes((IsAuthenticatedOrReadOnly,))
 def protected_user_view(request, pk):
     '''
@@ -111,7 +111,7 @@ def protected_user_view(request, pk):
     Updates user profile
     """
 
-    if request.method == 'PATCH':
+    if request.method == 'PUT':
         data = request.data
 
         try:
@@ -148,7 +148,7 @@ def protected_user_view(request, pk):
     """
     Change user password
     """
-    if request.method == 'POST':
+    if request.method == 'PATCH':
         data = request.data
         try:
             old_password, new_password1, new_password2 = data['old_password'], data['new_password1'], data['new_password2']
