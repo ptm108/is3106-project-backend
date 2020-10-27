@@ -15,7 +15,7 @@ class GroupbuySerializer(serializers.ModelSerializer):
         read_only_fields = (
             'status',
             'recipe',
-            'vender',
+            'vendor',
         )
         fields = '__all__'
     # end Meta class

@@ -129,13 +129,13 @@ def protected_groupbuy_view(request, pk):
         data = request.data
 
         try:
-            moq, order_by, final_price = int(data['minimum_order_quantity']), datetime.strptime(data['order_by'], '%Y-%m-%d'), float(data['final_price'])
-        except ValueError:
+            moq, order_by, final_price, delivery_fee = int(data['minimum_order_quantity']), datetime.strptime(data['order_by'], '%Y-%m-%d'), float(data['final_price']), float(data['delivery_fee'])
+        except (ValueError, KeyError):
             return Response({'message': 'Check your data'}, status=status.HTTP_400_BAD_REQUEST)
         # end try-except
 
         try:
-            Groupbuy.groupbuys.filter(pk=pk).update(minimum_order_quantity=moq, order_by=order_by, final_price=final_price)
+            Groupbuy.groupbuys.filter(pk=pk).update(minimum_order_quantity=moq, order_by=order_by, final_price=final_price, delivery_fee=delivery_fee)
             groupbuy = Groupbuy.groupbuys.get(pk=pk)
             
             serializer = GroupbuySerializer(groupbuy)
@@ -164,7 +164,7 @@ def protected_order_view(request, pk):
         try:
             delivery_address = DeliveryAddress.address_list.get(pk=data['add_id'])
             groupbuy = Groupbuy.groupbuys.get(pk=data['gb_id'])
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValueError):
             return Response({'message': 'Check your Groupbuy and Address ids'}, status=status.HTTP_404_NOT_FOUND)
         # end try-except
 
@@ -175,17 +175,22 @@ def protected_order_view(request, pk):
 
         # start atomic transaction to create order
         with transaction.atomic():
-            new_order = Order(
-                order_quantity=int(data['order_quantity']),
-                order_price=float(groupbuy.final_price) * float(data['order_quantity']),
-                delivery_address=delivery_address,
-                buyer=user,
-                groupbuy=groupbuy
-            )
-            new_order.save()
+            try:
+                new_order = Order(
+                    order_quantity=int(data['order_quantity']),
+                    order_price=float(groupbuy.final_price) * float(data['order_quantity']),
+                    delivery_address=delivery_address,
+                    contact_number=data['contact_number'],
+                    buyer=user,
+                    groupbuy=groupbuy
+                )
+                new_order.save()
 
-            groupbuy.current_order_quantity = groupbuy.current_order_quantity + int(data['order_quantity'])
-            groupbuy.save()
+                groupbuy.current_order_quantity = groupbuy.current_order_quantity + int(data['order_quantity'])
+                groupbuy.save()
+            except ValueError:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            # end try-except
 
             return Response({
                 'message': 'Order created',
