@@ -45,6 +45,8 @@ class Order(models.Model):
     order_date = models.DateTimeField(default=timezone.now, editable=False)
     order_quantity = models.PositiveSmallIntegerField()
     order_price = models.DecimalField(decimal_places=2, max_digits=6)
+    delivery_fee = models.DecimalField(decimal_places=2, max_digits=6, default=None, null=True)
+    contact_number = models.CharField(max=15, null=True)
 
     # user who placed order, deleted when user is deleted
     buyer = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, null=True)
