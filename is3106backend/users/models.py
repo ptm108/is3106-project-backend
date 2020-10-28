@@ -55,7 +55,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     name = models.CharField(max_length=200, null=True)
     contact_number = models.CharField(max_length=15, null=True)
-    profile_photo = models.ImageField(upload_to=user_directory_path, max_length=100, blank=True, null=True, default='')
+    profile_photo = models.ImageField(upload_to=user_directory_path, max_length=100, blank=True, null=True, default='/static/user-profile.png')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
