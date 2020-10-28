@@ -5,7 +5,8 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 
@@ -37,7 +38,7 @@ def user_view(request):
         with transaction.atomic():
             try:
                 user = CustomUser.objects.create_user(data['email'], data['password'])
-                if hasattr(data, 'name') and data['name'] is not None:
+                if 'name' in data and data['name'] is not None:
                     user.name = data['name']
                 # end if
 
@@ -61,15 +62,16 @@ def user_view(request):
 
 @api_view(['GET', 'DELETE', 'PATCH', 'PUT'])
 @permission_classes((IsAuthenticatedOrReadOnly,))
+@parser_classes((MultiPartParser, FormParser,))
 def protected_user_view(request, pk):
     '''
     Get current user
     '''
     if request.method == 'GET':
-        if pk is None: return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
             user = CustomUser.objects.get(pk=pk)
+
             if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
                 vendor = VendorUser.objects.get(user=user)
             return Response({
@@ -79,10 +81,13 @@ def protected_user_view(request, pk):
                 'name': user.name,
                 'contact_number': user.contact_number,
                 'vendor_name': vendor.vendor_name,
-                'is_vendor': vendor.is_vendor
+                'is_vendor': vendor.is_vendor,
+                'profile_photo': user.profile_photo,
             }, status=status.HTTP_200_OK)
         except VendorUser.DoesNotExist:
-            return Response({'id': user.id, 'email': user.email, 'date_joined': user.date_joined, 'name': user.name, 'contact_number': user.contact_number, 'is_vendor': False}, status=status.HTTP_200_OK)
+            serializer = CustomUserSerializer(user)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         # end try-except
@@ -118,17 +123,21 @@ def protected_user_view(request, pk):
 
         try:
             user = CustomUser.objects.get(pk=pk)
-            if hasattr(data, 'name'):
+
+            # checks if requesting user is same user
+            if (user != request.user): return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+            if 'name' in data:
                 user.name = data['name']
-            if hasattr(data, 'email'):
-                user.email = data['email']
-            if hasattr(data, 'contact_number'):
+            if 'contact_number' in data:
                 user.contact_number = data['contact_number']
+            if 'profile_photo' in data:
+                user.profile_photo = data['profile_photo']
             # end ifs
 
             user.save()
 
-            if hasattr(data, 'vendor_name'):
+            if 'vendor_name' in data:
                 try:
                     vendor = VendorUser.objects.get(user=user)
                     vendor.vendor_name = data['vendor_name']
@@ -138,7 +147,7 @@ def protected_user_view(request, pk):
                 # end try-except
             # end if
 
-            return Response(status=status.HTTP_200_OK)
+            return Response(data, status=status.HTTP_200_OK)
 
         except CustomUser.DoesNotExist:
             return Response({'message': 'User profile not found'}, status=status.HTTP_400_BAD_REQUEST)
@@ -161,6 +170,9 @@ def protected_user_view(request, pk):
 
         try:
             user = CustomUser.objects.get(pk=pk)
+
+            # checks if requesting user is same user
+            if (user != request.user): return Response(status=status.HTTP_401_UNAUTHORIZED)
 
             currentpassword = user.password  # user's current password
             matchcheck = check_password(old_password, currentpassword)
