@@ -2,7 +2,8 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils import timezone
@@ -28,6 +29,7 @@ class DefaultView(APIView):
 
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes((IsAuthenticated,))
+@parser_classes((MultiPartParser, FormParser,))
 def protected_recipe_view(request):
     '''
     Retrieves all recipes created by user making request
@@ -48,7 +50,7 @@ def protected_recipe_view(request):
             
             page_obj = paginator.get_page(page_number)
 
-            serializer = RecipeSerializer(page_obj, many=True)
+            serializer = RecipeSerializer(page_obj, many=True, context={"request": request})
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Recipe.DoesNotExist:
@@ -62,7 +64,7 @@ def protected_recipe_view(request):
     """
     if request.method == 'POST':
         user = request.user
-        data = request.data
+        data = json.loads(request.data['data'])
 
         # date validation
         f_date = utc.localize(datetime.strptime(data['fulfillment_date'], '%Y-%m-%d'))
@@ -80,6 +82,11 @@ def protected_recipe_view(request):
                 estimated_price_end=data['estimated_price_end'],
                 owner=user
             )
+
+            if 'display_photo' in request.data:
+                recipe.display_photo = request.data['display_photo']
+            # end if
+
             recipe.save()
 
             # create necessary ingredients
