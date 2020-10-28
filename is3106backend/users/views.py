@@ -23,7 +23,7 @@ class HelloView(APIView):
 # end class
 
 
-@api_view(['POST', 'GET'])
+@api_view(['POST'])
 @permission_classes((AllowAny,))
 def user_view(request):
     """
@@ -53,8 +53,8 @@ def user_view(request):
 
             return Response(content, status=status.HTTP_201_CREATED)
         # end with
-
     # end if
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 # end def
 
@@ -66,6 +66,8 @@ def protected_user_view(request, pk):
     Get current user
     '''
     if request.method == 'GET':
+        if pk is None: return Response(status=status.HTTP_404_NOT_FOUND)
+
         try:
             user = CustomUser.objects.get(pk=pk)
             if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
