@@ -69,7 +69,7 @@ def groupbuy_view(request):
 
         result_page = paginator.paginate_queryset(groupbuys, request)
 
-        serializer = GroupbuySerializer(result_page, many=True)
+        serializer = GroupbuySerializer(result_page, many=True, context={"request": request})
 
         return paginator.get_paginated_response(serializer.data)
     # end if
@@ -88,7 +88,7 @@ def protected_groupbuy_view(request, pk):
         try:
             groupbuy = Groupbuy.groupbuys.get(pk=pk)
             
-            serializer = GroupbuySerializer(groupbuy)
+            serializer = GroupbuySerializer(groupbuy, context={"request": request})
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Groupbuy.DoesNotExist:
@@ -122,7 +122,7 @@ def protected_groupbuy_view(request, pk):
     # end if
 
     """
-    Updates groupbuy minimum order quantity, order by date, final price
+    Updates groupbuy minimum order quantity, order by date, final price, delivery fee
     Only accessible by vendors
     """
     if request.method == 'PUT':
@@ -138,7 +138,7 @@ def protected_groupbuy_view(request, pk):
             Groupbuy.groupbuys.filter(pk=pk).update(minimum_order_quantity=moq, order_by=order_by, final_price=final_price, delivery_fee=delivery_fee)
             groupbuy = Groupbuy.groupbuys.get(pk=pk)
             
-            serializer = GroupbuySerializer(groupbuy)
+            serializer = GroupbuySerializer(groupbuy, context={"request": request})
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Groupbuy.DoesNotExist:
