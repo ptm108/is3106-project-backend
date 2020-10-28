@@ -7,6 +7,9 @@ from django.utils import timezone
 
 import uuid
 
+def user_directory_path(instance, filename):
+    return 'user_{0}/{1}'.format(instance.id, filename)
+# end def
 
 class CustomUserManager(BaseUserManager):
     """
@@ -52,6 +55,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     name = models.CharField(max_length=200, null=True)
     contact_number = models.CharField(max_length=15, null=True)
+    profile_photo = models.ImageField(upload_to=user_directory_path, max_length=100, default=None, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

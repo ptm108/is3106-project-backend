@@ -85,7 +85,7 @@ def protected_user_view(request, pk):
                 'profile_photo': user.profile_photo,
             }, status=status.HTTP_200_OK)
         except VendorUser.DoesNotExist:
-            serializer = CustomUserSerializer(user)
+            serializer = CustomUserSerializer(user, context={"request": request})
             
             return Response(serializer.data, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
@@ -147,7 +147,7 @@ def protected_user_view(request, pk):
                 # end try-except
             # end if
 
-            return Response(data, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
 
         except CustomUser.DoesNotExist:
             return Response({'message': 'User profile not found'}, status=status.HTTP_400_BAD_REQUEST)
