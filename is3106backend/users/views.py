@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 
 from .models import CustomUser, VendorUser, DeliveryAddress
-from .serializers import CustomUserSerializer, DeliveryAddressSerializer
+from .serializers import CustomUserSerializer, DeliveryAddressSerializer, VendorSerializer
 
 
 class HelloView(APIView):
@@ -74,16 +74,11 @@ def protected_user_view(request, pk):
 
             if hasattr(VendorUser.objects.get(user=user), 'is_vendor'):
                 vendor = VendorUser.objects.get(user=user)
-            return Response({
-                'id': user.id,
-                'email': user.email,
-                'date_joined': user.date_joined,
-                'name': user.name,
-                'contact_number': user.contact_number,
-                'vendor_name': vendor.vendor_name,
-                'is_vendor': vendor.is_vendor,
-                'profile_photo': user.profile_photo,
-            }, status=status.HTTP_200_OK)
+                serializer = VendorSerializer(vendor, context={"request": request})
+            
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            # end if
+            
         except VendorUser.DoesNotExist:
             serializer = CustomUserSerializer(user, context={"request": request})
             

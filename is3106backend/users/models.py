@@ -55,7 +55,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     name = models.CharField(max_length=200, null=True)
     contact_number = models.CharField(max_length=15, null=True)
-    profile_photo = models.ImageField(upload_to=user_directory_path, max_length=100, default=None, null=True)
+    profile_photo = models.ImageField(upload_to=user_directory_path, max_length=100, blank=True, null=True, default='')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -83,7 +83,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class VendorUser(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    vendor_name = models.CharField(max_length=200, null=True)
+    vendor_name = models.CharField(max_length=200, null=True, default='')
     is_vendor = models.BooleanField(default=False, editable=False)
 
     def __str__(self):

@@ -11,7 +11,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def get_profile_photo_url(self, obj):
         request = self.context.get("request")
-        return request.build_absolute_uri(obj.profile_photo.url)
+        if obj.profile_photo and hasattr(obj.profile_photo, 'url'):
+            return request.build_absolute_uri(obj.profile_photo.url)
+        else:
+            return ""
     # end def
     
 # end class
@@ -28,6 +31,7 @@ class VendorSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer()
     class Meta:
         model = VendorUser
+        read_only_fields = ('user',)
         fields = '__all__'
     # end Meta class
 
