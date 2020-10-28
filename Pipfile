@@ -12,6 +12,7 @@ djangorestframework = "*"
 pylint = "*"
 djangorestframework-simplejwt = "*"
 django-cors-headers = "*"
+pillow = "*"
 
 [requires]
 python_version = "3.8"
