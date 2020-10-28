@@ -6,7 +6,7 @@ from django.contrib.auth import update_session_auth_hash
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes, parser_classes
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 
@@ -62,7 +62,7 @@ def user_view(request):
 
 @api_view(['GET', 'DELETE', 'PATCH', 'PUT'])
 @permission_classes((IsAuthenticatedOrReadOnly,))
-@parser_classes((MultiPartParser, FormParser,))
+@parser_classes((MultiPartParser, FormParser, JSONParser))
 def protected_user_view(request, pk):
     '''
     Get current user
