@@ -36,7 +36,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         if obj.display_photo and hasattr(obj.display_photo, 'url'):
             return request.build_absolute_uri(obj.display_photo.url)
         else:
-            return ""
+            return request.build_absolute_uri('/static/recipe.jpg')
+        # end if-else
     # end def
 
 # end class
