@@ -3,6 +3,9 @@ from django.utils import timezone
 
 import uuid
 
+def recipe_directory_path(instance, filename):
+    return 'recipe_{0}/{1}'.format(instance.recipe_id, filename)
+# end def
 
 class Recipe(models.Model):
     recipe_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -11,6 +14,9 @@ class Recipe(models.Model):
     estimated_price_start = models.DecimalField(decimal_places=2, max_digits=6)
     estimated_price_end = models.DecimalField(decimal_places=2, max_digits=6)
     deleted = models.BooleanField(default=False)
+
+    # recipe display photo
+    display_photo = models.ImageField(upload_to=recipe_directory_path, max_length=100, blank=True, null=True, default='')
 
     # recipe owner, set null when user is deleted
     owner = models.ForeignKey('users.CustomUser', on_delete=models.SET_NULL, null=True)
