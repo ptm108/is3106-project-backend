@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Recipe, Ingredient
 
+from users.serializers import CustomUserSerializer
+
 
 class IngredientSerializer(serializers.ModelSerializer):
 
@@ -15,6 +17,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientSerializer(many=True)
     photo_url = serializers.SerializerMethodField('get_recipe_photo')
+    owner = CustomUserSerializer()
 
     class Meta:
         model = Recipe
