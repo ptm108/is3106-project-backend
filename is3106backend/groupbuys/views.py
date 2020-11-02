@@ -20,7 +20,7 @@ class DefaultView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        content = {'message': 'Orders Base URL'}
+        content = {'message': 'Groupbuys Base URL'}
         return Response(content)
     # end def
 # end class
