@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'users',
     'recipes',
     'orders',
+    'groupbuys',
     'rest_framework',
     'corsheaders',
     'django.contrib.admin',
