@@ -13,7 +13,7 @@ import json
 from pytz import utc
 
 from .models import Recipe, Ingredient
-from orders.models import Groupbuy
+from groupbuys.models import Groupbuy
 from .serializers import RecipeSerializer, IngredientSerializer
 
 
