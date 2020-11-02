@@ -36,7 +36,10 @@ urlpatterns = [
     path('recipes', include('recipes.urls')),
 
     # orders endpoints
-    path('groupbuys', include('orders.urls')),
+    path('groupbuys', include('groupbuys.urls')),
+
+    # orders endpoints
+    path('orders', include('orders.urls')),
 
     # rest framework end points
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -44,7 +47,7 @@ urlpatterns = [
     # simple jwt endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-] 
+]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
