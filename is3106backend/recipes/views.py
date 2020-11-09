@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from django.utils import timezone
 
 from datetime import datetime, timedelta
@@ -125,9 +125,23 @@ def protected_recipe_view(request):
 # end def
 
 
-@api_view(['DELETE'])
-@permission_classes((IsAuthenticated,))
-def delete_recipe(request, pk):
+@api_view(['GET', 'DELETE'])
+@permission_classes((IsAuthenticatedOrReadOnly,))
+def single_recipe_view(request, pk):
+    '''
+    GET single recipe by id
+    '''
+    if request.method == 'GET':
+        user = request.user
+        try:
+            recipe = Recipe.recipe_book.get(pk=pk)
+            serializer = RecipeSerializer(recipe, context={"request": request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Recipe.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        # end try-except
+    # end if
+    
     '''
     Marks a recipe as deleted
     HOWEVER, if group buy has been approved, it will still proceed accordingly
@@ -146,6 +160,7 @@ def delete_recipe(request, pk):
 # end def
 
 
+# DEPRECATED/ NOT IN USE
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def undelete_recipe(request, pk):
