@@ -23,5 +23,5 @@ COPY ./entrypoint.sh .
 # copy project
 COPY . .
 
-# run entrypoint.sh
-# ENTRYPOINT [ "/is3106backend/entrypoint.sh" ]
+run entrypoint.sh
+ENTRYPOINT [ "/is3106backend/entrypoint.sh" ]
