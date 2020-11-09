@@ -95,7 +95,7 @@ class VendorUser(models.Model):
 class DeliveryAddress(models.Model):
     add_id =  models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     address_line1 = models.CharField(max_length=100)
-    address_line2 = models.CharField(max_length=100)
+    address_line2 = models.CharField(max_length=100, null=True)
     postal_code = models.CharField(max_length=6)
 
     # user's delivery address

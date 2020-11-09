@@ -213,7 +213,7 @@ def protected_user_delivery_address_view(request, pk):
             try:
                 deliveryAddress = DeliveryAddress(
                     address_line1=data['address_line1'],
-                    address_line2=data['address_line2'],
+                    address_line2=data['address_line2'] if 'address_line2' in data else None,
                     postal_code=data['postal_code'],
                     user=user
                 )
