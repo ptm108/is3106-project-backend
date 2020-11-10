@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED 1
 
 # install psycopg2 dependencies
 RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev
+    && apk add postgresql-dev gcc python3-dev musl-dev jpeg-dev zlib-dev
 
 # install dependencies 
 COPY ./requirements.txt . 
@@ -23,5 +23,5 @@ COPY ./entrypoint.sh .
 # copy project
 COPY . .
 
-run entrypoint.sh
+# run entrypoint.sh
 ENTRYPOINT [ "/is3106backend/entrypoint.sh" ]

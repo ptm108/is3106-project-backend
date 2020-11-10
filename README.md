@@ -10,7 +10,7 @@ We are using docker containers for fast local deployment with minimal installati
 
 | Prerequisites  | Version | Links |
 | -------------- | ------- | ----- |
-| Docker Desktop | 19.03.12 | [Link](https://www.docker.com/products/docker-desktop) |
+| Docker Desktop | 19.03.13 | [Link](https://www.docker.com/products/docker-desktop) |
 
 ### To deploy locally
 
